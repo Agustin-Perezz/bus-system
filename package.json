@@ -1,0 +1,88 @@
+{
+  "name": "scafolld-nestjs",
+  "version": "1.0.0",
+  "description": "Sistema de renta de autos con NestJS y Clean Architecture",
+  "main": "dist/main.js",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main",
+    "start:prod:postgres": "node dist/main-prod",
+    "lint": "biome lint ./src",
+    "format": "biome format ./src --write",
+    "check": "biome check --write ./src",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:cov": "jest --coverage",
+    "test:e2e": "jest --config test/jest-e2e.js",
+    "test:e2e:cov": "jest --config test/jest-e2e.js --coverage",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f postgres",
+    "migration:create": "mikro-orm migration:create",
+    "migration:up": "mikro-orm migration:up",
+    "migration:down": "mikro-orm migration:down",
+    "migration:list": "mikro-orm migration:list",
+    "migration:pending": "mikro-orm migration:pending",
+    "migration:fresh": "mikro-orm migration:fresh",
+    "migration:check": "mikro-orm migration:check",
+    "prepare": "husky",
+    "lint:staged": "lint-staged"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^10.5.0",
+    "@mikro-orm/core": "^7.1.10",
+    "@mikro-orm/migrations": "^7.1.10",
+    "@mikro-orm/nestjs": "^7.0.2",
+    "@mikro-orm/postgresql": "^7.1.10",
+    "@mikro-orm/seeder": "^7.1.10",
+    "@nestjs/common": "^11.1.28",
+    "@nestjs/core": "^11.1.28",
+    "@nestjs/platform-express": "^11.1.28",
+    "@nestjs/swagger": "^11.4.6",
+    "@sentry/nestjs": "^10.69.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "dotenv": "^17.4.2",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "uuid": "^14.0.1"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "biome check --write"
+    ]
+  },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./mikro-orm.config.ts",
+      "./dist/mikro-orm.config.js"
+    ]
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.6",
+    "@mikro-orm/cli": "^7.1.10",
+    "@mikro-orm/sqlite": "^7.1.10",
+    "@nestjs/cli": "^11.0.24",
+    "@nestjs/schematics": "^11.1.0",
+    "@nestjs/testing": "^11.1.28",
+    "@swc/core": "^1.15.47",
+    "@swc/jest": "^0.2.39",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^26.1.2",
+    "@types/supertest": "^7.2.1",
+    "@types/uuid": "^11.0.0",
+    "husky": "^9.1.7",
+    "jest": "^30.4.2",
+    "lint-staged": "^17.2.0",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.12",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.7",
+    "typescript": "^6.0.3"
+  }
+}
