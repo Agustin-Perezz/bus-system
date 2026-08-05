@@ -54,7 +54,6 @@ describe('Enterprise Entity', () => {
   describe('legalId', () => {
     it('is immutable', () => {
       const enterprise = Enterprise.create({ name: 'Acme', legalId: 'X-1' });
-      // ponytail: legalId immutable, like ISBN precedent in book entity
       expect(enterprise.legalId).toBe('X-1');
       expect((enterprise as unknown as Record<string, unknown>).updateLegalId).toBeUndefined();
     });
