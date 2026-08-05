@@ -14,186 +14,101 @@ Interactive documentation available at:
 http://localhost:3000/api
 ```
 
----
-
-## Books Endpoints
-
-### POST /books
-
-Create a new book.
-
-**Request Body**
-
-```json
-{
-  "title": "Clean Architecture",
-  "author": "Robert C. Martin",
-  "isbn": "978-0-13-468599-1",
-  "publicationYear": 2017,
-  "genre": "Software Engineering"
-}
-```
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `title` | string | yes | Book title |
-| `author` | string | yes | Author name |
-| `isbn` | string | yes | ISBN (must be unique) |
-| `publicationYear` | integer | yes | Year (1000–9999) |
-| `genre` | string | no | Genre |
-
-**Response 201**
-
-```json
-{
-  "id": "019612b8-d3c4-7e9a-a456-426614174000",
-  "title": "Clean Architecture",
-  "author": "Robert C. Martin",
-  "isbn": "978-0-13-468599-1",
-  "publicationYear": 2017,
-  "genre": "Software Engineering",
-  "createdAt": "2026-04-14T10:00:00.000Z",
-  "updatedAt": "2026-04-14T10:00:00.000Z"
-}
-```
-
-**Error Responses**
-
-| Status | Description |
-|--------|-------------|
-| 400 | Invalid data or duplicate ISBN |
+The Swagger UI is the source of truth for request/response schemas, validation
+rules, and error shapes. Use it to explore each endpoint in detail.
 
 ---
 
-### GET /books
+## Resources
 
-List all books.
+Five resources, each with full CRUD:
 
-**Response 200**
-
-```json
-{
-  "books": [
-    {
-      "id": "019612b8-d3c4-7e9a-a456-426614174000",
-      "title": "Clean Architecture",
-      "author": "Robert C. Martin",
-      "isbn": "978-0-13-468599-1",
-      "publicationYear": 2017,
-      "genre": "Software Engineering",
-      "createdAt": "2026-04-14T10:00:00.000Z",
-      "updatedAt": "2026-04-14T10:00:00.000Z"
-    }
-  ]
-}
-```
+| Resource | Base path | Description | FK |
+|----------|-----------|-------------|----|
+| Enterprise | `/enterprises` | Bus companies | — |
+| Route | `/routes` | Travel routes between terminals | — |
+| User | `/users` | People employed by an enterprise | `enterpriseId` → Enterprise |
+| Bus | `/buses` | Vehicles owned by an enterprise | `enterpriseId` → Enterprise |
+| Trip | `/trips` | Scheduled departures on a route | `routeId` → Route |
 
 ---
 
-### GET /books/:id
+## Endpoint Summary
 
-Get a book by ID.
+Every resource exposes the same five operations:
 
-**Path Parameters**
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/{resource}` | Create a new resource |
+| `GET` | `/{resource}` | List resources (paginated) |
+| `GET` | `/{resource}/:id` | Get a resource by ID |
+| `PUT` | `/{resource}/:id` | Update a resource (partial, only provided fields) |
+| `DELETE` | `/{resource}/:id` | Delete a resource |
 
-| Parameter | Description |
-|-----------|-------------|
-| `id` | Book UUID |
+### Pagination
 
-**Response 200**
+`GET` list endpoints accept query parameters:
 
-```json
-{
-  "id": "019612b8-d3c4-7e9a-a456-426614174000",
-  "title": "Clean Architecture",
-  "author": "Robert C. Martin",
-  "isbn": "978-0-13-468599-1",
-  "publicationYear": 2017,
-  "genre": "Software Engineering",
-  "createdAt": "2026-04-14T10:00:00.000Z",
-  "updatedAt": "2026-04-14T10:00:00.000Z"
-}
-```
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `limit` | number | 10 | Items per page |
+| `offset` | number | 0 | Items to skip |
 
-**Error Responses**
-
-| Status | Description |
-|--------|-------------|
-| 404 | Book not found |
+Returns `{ items: [...], total, limit, offset }`.
 
 ---
 
-### PUT /books/:id
+## Request Bodies
 
-Update a book. Only provided fields are updated.
-
-**Path Parameters**
-
-| Parameter | Description |
-|-----------|-------------|
-| `id` | Book UUID |
-
-**Request Body** (all fields optional)
+### Enterprise
 
 ```json
-{
-  "title": "Clean Architecture (Updated Edition)",
-  "author": "Robert C. Martin",
-  "publicationYear": 2018,
-  "genre": "Software Architecture"
-}
+{ "name": "Acme Bus Co.", "legalId": "US-12-3456789" }
 ```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `title` | string | New title |
-| `author` | string | New author |
-| `publicationYear` | integer | New year (1000–9999) |
-| `genre` | string \| null | New genre (null to clear) |
+- `legalId` is immutable after creation.
 
-**Note**: `isbn` cannot be updated.
-
-**Response 200**
+### Route
 
 ```json
-{
-  "id": "019612b8-d3c4-7e9a-a456-426614174000",
-  "title": "Clean Architecture (Updated Edition)",
-  "author": "Robert C. Martin",
-  "isbn": "978-0-13-468599-1",
-  "publicationYear": 2018,
-  "genre": "Software Architecture",
-  "createdAt": "2026-04-14T10:00:00.000Z",
-  "updatedAt": "2026-04-14T11:00:00.000Z"
-}
+{ "name": "Central - North", "origin": "Terminal Central", "destination": "Terminal Norte" }
 ```
 
-**Error Responses**
+### User
 
-| Status | Description |
-|--------|-------------|
-| 400 | Invalid data |
-| 404 | Book not found |
+```json
+{ "name": "Jane Driver", "email": "jane@acme.com", "role": "driver", "enterpriseId": "<uuid>" }
+```
+
+- `email` must be unique.
+- `role` must be one of `admin`, `driver`, `user`.
+- `enterpriseId` must reference an existing enterprise (404 if missing).
+
+### Bus
+
+```json
+{ "model": "Mercedes-Benz O500", "enterpriseId": "<uuid>" }
+```
+
+- `enterpriseId` must reference an existing enterprise (404 if missing).
+
+### Trip
+
+```json
+{ "departureAt": "2026-08-10T08:00:00.000Z", "routeId": "<uuid>" }
+```
+
+- `departureAt` is an ISO 8601 date string.
+- `routeId` must reference an existing route (404 if missing).
 
 ---
 
-### DELETE /books/:id
+## FK Validation Ordering
 
-Delete a book.
-
-**Path Parameters**
-
-| Parameter | Description |
-|-----------|-------------|
-| `id` | Book UUID |
-
-**Response 204** — No content
-
-**Error Responses**
-
-| Status | Description |
-|--------|-------------|
-| 404 | Book not found |
+For resources with a foreign key, the use case validates FK existence FIRST
+(404) before any business constraint (400). A missing reference takes
+precedence over a duplicate or invalid value — you can't violate a business
+rule for an entity that points to something that doesn't exist.
 
 ---
 
@@ -201,10 +116,9 @@ Delete a book.
 
 | Code | Description |
 |------|-------------|
-| `200` | OK - Successful operation |
-| `201` | Created - Resource created |
-| `204` | No Content - Successful deletion |
-| `400` | Bad Request - Invalid data |
-| `404` | Not Found - Resource not found |
+| `200` | OK — successful read or update |
+| `201` | Created — resource created |
+| `204` | No Content — successful deletion |
+| `400` | Bad Request — invalid data or business constraint violation |
+| `404` | Not Found — resource or FK target not found |
 | `500` | Internal Server Error |
-

@@ -1,20 +1,57 @@
-# Scaffold Nest JS
+# Bus System
 
-[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_scaffold-nestjs&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_scaffold-nestjs)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_scaffold-nestjs&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_scaffold-nestjs)
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_bus-system&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_bus-system)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_bus-system&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_bus-system)
 
-> This project is a clone of [r-argentina-programa/arquitectura](https://github.com/r-argentina-programa/arquitectura/tree/main).
+REST API for a bus transportation system, built with NestJS and Clean
+Architecture. Manages enterprises, routes, users, buses, and trips.
 
-Example project demonstrating **Clean Architecture** with NestJS and MikroORM.
+## Domain Model
+
+```mermaid
+erDiagram
+    Enterprise ||--o{ User : "employs"
+    Enterprise ||--o{ Bus : "owns"
+    Route ||--o{ Trip : "schedules"
+
+    Enterprise {
+        uuid id PK
+        string name
+        string legal_id UK
+    }
+    Route {
+        uuid id PK
+        string name
+        string origin
+        string destination
+    }
+    User {
+        uuid id PK
+        string name
+        string email UK
+        string role
+        uuid enterprise_id FK
+    }
+    Bus {
+        uuid id PK
+        string model
+        uuid enterprise_id FK
+    }
+    Trip {
+        uuid id PK
+        datetime departure_at
+        uuid route_id FK
+    }
+```
 
 ## Architecture
 
 ```
 src/
 ├── domain/           # Pure entities (no decorators)
-├── application/     # Use cases
-├── infrastructure/  # Repositories, MikroORM
-└── presentation/    # REST controllers
+├── application/      # Use cases
+├── infrastructure/   # Repositories, MikroORM
+└── presentation/     # REST controllers
 ```
 
 ### Key Principles
@@ -39,7 +76,7 @@ src/
 1. **Clone the repository**
    ```bash
    git clone <repo-url>
-   cd books-api
+   cd bus-system
    ```
 
 2. **Install dependencies**
@@ -55,19 +92,14 @@ src/
 
 4. **Start PostgreSQL with Docker**
    ```bash
-   # Start the PostgreSQL container
    pnpm docker:up
-
-   # Verify it's running
    pnpm docker:logs
    ```
 
 5. **Build and run the application**
    ```bash
-   # Development mode (with hot-reload)
-   pnpm start:dev
-
-   # Or build and run in production mode
+   pnpm start:dev     # Development (hot-reload)
+   # or
    pnpm build
    pnpm start:prod
    ```
@@ -79,14 +111,9 @@ src/
 ### Docker Commands
 
 ```bash
-# Start PostgreSQL
-pnpm docker:up
-
-# Stop PostgreSQL
-pnpm docker:down
-
-# View logs
-pnpm docker:logs
+pnpm docker:up      # Start PostgreSQL
+pnpm docker:down    # Stop PostgreSQL
+pnpm docker:logs    # View logs
 ```
 
 ### Environment Variables
@@ -138,4 +165,3 @@ pnpm check              # Lint + format + organize imports
 - [Use Cases](./docs/03_USE_CASES.md)
 - [API](./docs/04_API.md)
 - [Testing](./docs/07_TESTING.md)
-- [Use Case Pattern](./docs/USE_CASE_PATTERN.md)

@@ -41,22 +41,23 @@ graph TB
 
 ```
 src/
-├── app.module.ts                          # Root module (DatabaseModule + BooksModule)
-├── books.module.ts                        # forFeature([BookEntitySchema])
+├── app.module.ts                          # Root module (DatabaseModule + domain modules)
+├── {domain}.module.ts                     # One per domain — forFeature([...schemas])
 │
 ├── domain/
 │   └── entities/
 │       ├── base.entity.ts                 # Abstract BaseEntity (id, createdAt, updatedAt, touch)
-│       └── book.entity.ts                 # Book extends BaseEntity (no decorators)
+│       ├── enterprise.entity.ts           # Enterprise, Route, User, Bus, Trip
+│       └── ...
 │
 ├── application/
 │   └── use-cases/
-│       └── books/
-│           ├── create-book/
-│           ├── get-book/
-│           ├── list-books/
-│           ├── update-book/
-│           └── delete-book/
+│       └── {domain}/                      # enterprises, routes, users, buses, trips
+│           ├── create-{entity}/
+│           ├── get-{entity}/
+│           ├── list-{entity}s/
+│           ├── update-{entity}/
+│           └── delete-{entity}/
 │
 ├── infrastructure/
 │   └── database/
@@ -64,18 +65,18 @@ src/
 │       └── postgres/
 │           ├── entities/
 │           │   ├── base.entity.ts         # BaseEntitySchema (defineEntity, abstract)
-│           │   └── book.entity.ts         # BookEntity extends BaseEntity
+│           │   ├── enterprise.entity.ts   # MikroORM entities (defineEntity, no decorators)
+│           │   └── ...
 │           ├── factories/                 # MikroORM seeder factories (test seed data)
-│           │   └── book.factory.ts
 │           └── repositories/
-│               └── books/
+│               └── {domain}/              # one repo file per use case
 │
 ├── migrations/                            # MikroORM migration files (TS source)
 │
 └── presentation/
     └── controllers/
-        └── books/
-            └── books.controller.ts
+        └── {domain}/
+            └── {domain}.controller.ts
 ```
 
 ### 3. Data Flow
