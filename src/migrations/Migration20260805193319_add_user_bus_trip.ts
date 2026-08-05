@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260805193319 extends Migration {
+export class Migration20260805193319AddUserBusTrip extends Migration {
   override up(): void | Promise<void> {
     this.addSql(
       `create table "buses" ("id" uuid not null, "created_at" timestamptz not null, "updated_at" timestamptz not null, "model" varchar(255) not null, "enterprise_id" uuid not null, primary key ("id"));`,
