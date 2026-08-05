@@ -6,10 +6,12 @@ import { SeedManager } from '@mikro-orm/seeder';
 
 import { AuthorEntitySchema } from './src/infrastructure/database/postgres/entities/author.entity';
 import { BookEntitySchema } from './src/infrastructure/database/postgres/entities/book.entity';
+import { EnterpriseEntitySchema } from './src/infrastructure/database/postgres/entities/enterprise.entity';
+import { RouteEntitySchema } from './src/infrastructure/database/postgres/entities/route.entity';
 
 export const ormConfig = defineConfig({
   clientUrl: `postgresql://${process.env.DB_USERNAME || 'postgres'}:${process.env.DB_PASSWORD || 'postgres'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}/${process.env.DB_NAME || 'books'}`,
-  entities: [AuthorEntitySchema, BookEntitySchema],
+  entities: [AuthorEntitySchema, BookEntitySchema, EnterpriseEntitySchema, RouteEntitySchema],
   allowGlobalContext: true,
   extensions: [SeedManager, Migrator],
   migrations: {

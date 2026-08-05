@@ -4,10 +4,12 @@ import { SentryGlobalFilter } from '@sentry/nestjs/setup';
 
 import { AuthorsModule } from './authors.module';
 import { BooksModule } from './books.module';
+import { EnterprisesModule } from './enterprises.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
+import { RoutesModule } from './routes.module';
 
 @Module({
-  imports: [DatabaseModule, BooksModule, AuthorsModule],
+  imports: [DatabaseModule, BooksModule, AuthorsModule, EnterprisesModule, RoutesModule],
   providers: [
     {
       provide: APP_FILTER,
