@@ -16,9 +16,6 @@ export class UserResponseDto {
   @ApiProperty({ description: 'User role' })
   role: UserRole;
 
-  @ApiProperty({ description: 'Enterprise ID' })
-  enterpriseId: string;
-
   @ApiProperty({ description: 'Creation timestamp' })
   createdAt: Date;
 

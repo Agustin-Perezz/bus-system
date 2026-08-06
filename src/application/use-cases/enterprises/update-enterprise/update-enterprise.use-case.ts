@@ -17,6 +17,14 @@ export class UpdateEnterpriseUseCase {
       throw new NotFoundException('Enterprise not found');
     }
 
+    if (dto.ownerId !== undefined) {
+      const owner = await this.repository.findUserById(dto.ownerId);
+      if (!owner) {
+        throw new NotFoundException('Owner user not found');
+      }
+      enterprise.updateOwnerId(dto.ownerId);
+    }
+
     if (dto.name !== undefined) {
       enterprise.updateName(dto.name);
     }
@@ -27,6 +35,7 @@ export class UpdateEnterpriseUseCase {
       id: updated.id,
       name: updated.name,
       legalId: updated.legalId,
+      ownerId: updated.ownerId,
       createdAt: updated.createdAt,
       updatedAt: updated.updatedAt,
     });

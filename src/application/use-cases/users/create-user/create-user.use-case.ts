@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 
 import { User } from '../../../../domain/entities/user.entity';
 import { ICreateUserRepository } from './create-user.repository.interface';
@@ -13,11 +13,6 @@ export class CreateUserUseCase {
   ) {}
 
   async execute(dto: CreateUserRequestDto): Promise<CreateUserResponseDto> {
-    const enterprise = await this.repository.findEnterpriseById(dto.enterpriseId);
-    if (!enterprise) {
-      throw new NotFoundException('Enterprise not found');
-    }
-
     const emailExists = await this.repository.existsByEmail(dto.email);
     if (emailExists) {
       throw new BadRequestException('A user with that email already exists');
@@ -27,7 +22,6 @@ export class CreateUserUseCase {
       name: dto.name,
       email: dto.email,
       role: dto.role,
-      enterpriseId: dto.enterpriseId,
     });
     const created = await this.repository.create(user);
 
@@ -36,7 +30,6 @@ export class CreateUserUseCase {
       name: created.name,
       email: created.email,
       role: created.role,
-      enterpriseId: created.enterpriseId,
       createdAt: created.createdAt,
       updatedAt: created.updatedAt,
     });

@@ -36,7 +36,6 @@ export class DeleteUserRepository implements IDeleteUserRepository {
       name: entity.name,
       email: entity.email,
       role: entity.role,
-      enterpriseId: entity.enterprise,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });

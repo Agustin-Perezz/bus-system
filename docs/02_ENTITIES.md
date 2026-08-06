@@ -44,9 +44,12 @@ classDiagram
     class Enterprise {
         -_name: string
         -_legalId: string
+        -_ownerId: string
         +get name(): string
         +get legalId(): string
+        +get ownerId(): string
         +updateName(name): void
+        +updateOwnerId(id): void
         +create(params): Enterprise
         +reconstruct(params): Enterprise
     }
@@ -67,15 +70,12 @@ classDiagram
         -_name: string
         -_email: string
         -_role: UserRole
-        -_enterpriseId: string
         +get name(): string
         +get email(): string
         +get role(): UserRole
-        +get enterpriseId(): string
         +updateName(name): void
         +updateEmail(email): void
         +updateRole(role): void
-        +updateEnterpriseId(id): void
         +create(params): User
         +reconstruct(params): User
     }
@@ -106,14 +106,15 @@ classDiagram
     BaseEntity <|-- Bus
     BaseEntity <|-- Trip
 
-    User --> Enterprise : enterpriseId
+    Enterprise --> User : ownerId
     Bus --> Enterprise : enterpriseId
     Trip --> Route : routeId
 ```
 
 Foreign keys are plain `string` IDs in the domain (no typed references).
-Infrastructure entities declare ORM relations via `p.manyToOne(X).mapToPk()` —
-the relation IS the FK column. See `docs/rules/relations.md`.
+Infrastructure entities declare ORM relations via `p.oneToOne(X).mapToPk()`
+(Enterprise→User) and `p.manyToOne(X).mapToPk()` (Bus→Enterprise, Trip→Route)
+— the relation IS the FK column. See `docs/rules/relations.md`.
 
 ---
 
@@ -124,14 +125,19 @@ the relation IS the FK column. See `docs/rules/relations.md`.
 | `id` | `string` | UUIDv7 (inherited) |
 | `name` | `string` | Enterprise name |
 | `legalId` | `string` | Legal ID (unique, immutable) |
+| `ownerId` | `string` | FK → User (unique, one-to-one) |
 | `createdAt` | `Date` | Creation timestamp (inherited) |
 | `updatedAt` | `Date` | Last modification (inherited) |
 
 **Immutable**: `legalId` — set on creation, no update method.
 
+Each enterprise has exactly one owner (User). The `ownerId` FK is unique on
+the `enterprises` table, enforcing the one-to-one constraint at the DB level.
+
 ```typescript
-const enterprise = Enterprise.create({ name: 'Acme Bus Co.', legalId: 'US-12-3456789' });
+const enterprise = Enterprise.create({ name: 'Acme Bus Co.', legalId: 'US-12-3456789', ownerId });
 enterprise.updateName('Acme Bus Co. Intl.');
+enterprise.updateOwnerId(newOwnerId);
 ```
 
 ---
@@ -163,7 +169,6 @@ const route = Route.create({ name: 'Central - North', origin: 'Terminal Central'
 | `name` | `string` | User name |
 | `email` | `string` | Email (unique) |
 | `role` | `UserRole` | `'admin' \| 'driver' \| 'user'` |
-| `enterpriseId` | `string` | FK → Enterprise |
 | `createdAt` | `Date` | Creation timestamp (inherited) |
 | `updatedAt` | `Date` | Last modification (inherited) |
 
@@ -171,8 +176,11 @@ const route = Route.create({ name: 'Central - North', origin: 'Terminal Central'
 with `@IsIn(USER_ROLES)`. The MikroORM `UserEntity.role` is typed as
 `UserRole` directly — no `as` casts in repositories.
 
+A user may own an enterprise (the ownership is modeled from the Enterprise
+side via `ownerId`). A user with no enterprise is valid.
+
 ```typescript
-const user = User.create({ name: 'Jane Driver', email: 'jane@acme.com', role: 'driver', enterpriseId });
+const user = User.create({ name: 'Jane Driver', email: 'jane@acme.com', role: 'driver' });
 user.updateRole('admin');
 ```
 

@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import { Factory } from '@mikro-orm/seeder';
-import { v7 as uuidv7 } from 'uuid';
 
 import { UserEntity } from '../entities/user.entity';
 
@@ -12,7 +11,6 @@ export class UserFactory extends Factory<UserEntity> {
       name: faker.person.fullName(),
       email: faker.internet.email(),
       role: faker.helpers.arrayElement(['admin', 'driver', 'user']),
-      enterprise: uuidv7(),
     };
   }
 }

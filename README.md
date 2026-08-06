@@ -10,7 +10,7 @@ Architecture. Manages enterprises, routes, users, buses, and trips.
 
 ```mermaid
 erDiagram
-    Enterprise ||--o{ User : "employs"
+    User ||--o| Enterprise : "owns"
     Enterprise ||--o{ Bus : "owns"
     Route ||--o{ Trip : "schedules"
 
@@ -18,6 +18,7 @@ erDiagram
         uuid id PK
         string name
         string legal_id UK
+        uuid owner_id FK
     }
     Route {
         uuid id PK
@@ -30,7 +31,6 @@ erDiagram
         string name
         string email UK
         string role
-        uuid enterprise_id FK
     }
     Bus {
         uuid id PK

@@ -7,6 +7,7 @@ import { GetEnterpriseUseCase } from './application/use-cases/enterprises/get-en
 import { ListEnterprisesUseCase } from './application/use-cases/enterprises/list-enterprises/list-enterprises.use-case';
 import { UpdateEnterpriseUseCase } from './application/use-cases/enterprises/update-enterprise/update-enterprise.use-case';
 import { EnterpriseEntitySchema } from './infrastructure/database/postgres/entities/enterprise.entity';
+import { UserEntitySchema } from './infrastructure/database/postgres/entities/user.entity';
 import { CreateEnterpriseRepository } from './infrastructure/database/postgres/repositories/enterprises/create-enterprise.repository';
 import { DeleteEnterpriseRepository } from './infrastructure/database/postgres/repositories/enterprises/delete-enterprise.repository';
 import { GetEnterpriseRepository } from './infrastructure/database/postgres/repositories/enterprises/get-enterprise.repository';
@@ -43,6 +44,6 @@ import { EnterprisesController } from './presentation/controllers/enterprises/en
     UpdateEnterpriseUseCase,
     DeleteEnterpriseUseCase,
   ],
-  imports: [MikroOrmModule.forFeature([EnterpriseEntitySchema])],
+  imports: [MikroOrmModule.forFeature([EnterpriseEntitySchema, UserEntitySchema])],
 })
 export class EnterprisesModule {}

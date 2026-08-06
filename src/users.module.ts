@@ -6,7 +6,6 @@ import { DeleteUserUseCase } from './application/use-cases/users/delete-user/del
 import { GetUserUseCase } from './application/use-cases/users/get-user/get-user.use-case';
 import { ListUsersUseCase } from './application/use-cases/users/list-users/list-users.use-case';
 import { UpdateUserUseCase } from './application/use-cases/users/update-user/update-user.use-case';
-import { EnterpriseEntitySchema } from './infrastructure/database/postgres/entities/enterprise.entity';
 import { UserEntitySchema } from './infrastructure/database/postgres/entities/user.entity';
 import { CreateUserRepository } from './infrastructure/database/postgres/repositories/users/create-user.repository';
 import { DeleteUserRepository } from './infrastructure/database/postgres/repositories/users/delete-user.repository';
@@ -44,6 +43,6 @@ import { UsersController } from './presentation/controllers/users/users.controll
     UpdateUserUseCase,
     DeleteUserUseCase,
   ],
-  imports: [MikroOrmModule.forFeature([UserEntitySchema, EnterpriseEntitySchema])],
+  imports: [MikroOrmModule.forFeature([UserEntitySchema])],
 })
 export class UsersModule {}

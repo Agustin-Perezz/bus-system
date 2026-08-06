@@ -4,7 +4,9 @@ import request from 'supertest';
 
 import { EnterprisesModule } from '../src/enterprises.module';
 import { EnterpriseEntitySchema } from '../src/infrastructure/database/postgres/entities/enterprise.entity';
+import { UserEntitySchema } from '../src/infrastructure/database/postgres/entities/user.entity';
 import { EnterpriseFactory } from '../src/infrastructure/database/postgres/factories/enterprise.factory';
+import { UserFactory } from '../src/infrastructure/database/postgres/factories/user.factory';
 import { createTestApp } from './helpers/app.helper';
 import { truncateAll } from './helpers/database.helper';
 
@@ -12,9 +14,13 @@ describe('Enterprises Controller (e2e)', () => {
   let app: INestApplication;
   let orm: MikroORM;
   let enterpriseId: string;
+  let ownerId: string;
 
   beforeAll(async () => {
-    ({ app, orm } = await createTestApp(EnterprisesModule, [EnterpriseEntitySchema]));
+    ({ app, orm } = await createTestApp(EnterprisesModule, [
+      EnterpriseEntitySchema,
+      UserEntitySchema,
+    ]));
   });
 
   afterAll(async () => {
@@ -23,23 +29,39 @@ describe('Enterprises Controller (e2e)', () => {
 
   beforeEach(async () => {
     await truncateAll(orm);
+
+    const owner = await new UserFactory(orm.em).createOne({
+      name: 'Jane Owner',
+      email: 'jane@acme.com',
+      role: 'admin',
+    });
+    ownerId = owner.id;
+
     const enterprise = await new EnterpriseFactory(orm.em).createOne({
       name: 'Acme Bus Co.',
       legalId: 'US-12-3456789',
+      owner: ownerId,
     });
     enterpriseId = enterprise.id;
   });
 
   describe('/enterprises (POST)', () => {
-    it('creates an enterprise correctly', () => {
+    it('creates an enterprise correctly', async () => {
+      const secondOwner = await new UserFactory(orm.em).createOne({
+        name: 'Second Owner',
+        email: 'second@acme.com',
+        role: 'admin',
+      });
+
       return request(app.getHttpServer())
         .post('/enterprises')
-        .send({ name: 'RoadRunner Lines', legalId: 'AR-30-12345678' })
+        .send({ name: 'RoadRunner Lines', legalId: 'AR-30-12345678', ownerId: secondOwner.id })
         .expect(201)
         .then((response) => {
           expect(response.body).toHaveProperty('id');
           expect(response.body.name).toBe('RoadRunner Lines');
           expect(response.body.legalId).toBe('AR-30-12345678');
+          expect(response.body.ownerId).toBe(secondOwner.id);
           expect(response.body).toHaveProperty('createdAt');
           expect(response.body).toHaveProperty('updatedAt');
         });
@@ -52,11 +74,24 @@ describe('Enterprises Controller (e2e)', () => {
         .expect(400);
     });
 
-    it('returns 400 on duplicate legalId', () => {
+    it('returns 400 on duplicate legalId', async () => {
+      const secondOwner = await new UserFactory(orm.em).createOne({
+        name: 'Dup Owner',
+        email: 'dup@acme.com',
+        role: 'admin',
+      });
+
       return request(app.getHttpServer())
         .post('/enterprises')
-        .send({ name: 'Clone', legalId: 'US-12-3456789' })
+        .send({ name: 'Clone', legalId: 'US-12-3456789', ownerId: secondOwner.id })
         .expect(400);
+    });
+
+    it('returns 404 when owner does not exist', () => {
+      return request(app.getHttpServer())
+        .post('/enterprises')
+        .send({ name: 'Orphan', legalId: 'XX-1', ownerId: '00000000-0000-0000-0000-000000000000' })
+        .expect(404);
     });
   });
 
@@ -93,6 +128,7 @@ describe('Enterprises Controller (e2e)', () => {
         .then((response) => {
           expect(response.body.id).toBe(enterpriseId);
           expect(response.body.name).toBe('Acme Bus Co.');
+          expect(response.body.ownerId).toBe(ownerId);
         });
     });
 
@@ -121,6 +157,13 @@ describe('Enterprises Controller (e2e)', () => {
         .send({ name: 'X' })
         .expect(404);
     });
+
+    it('returns 404 when owner not found on update', () => {
+      return request(app.getHttpServer())
+        .put(`/enterprises/${enterpriseId}`)
+        .send({ ownerId: '00000000-0000-0000-0000-000000000000' })
+        .expect(404);
+    });
   });
 
   describe('/enterprises/:id (DELETE)', () => {
@@ -140,9 +183,15 @@ describe('Enterprises Controller (e2e)', () => {
 
   describe('Complete workflow', () => {
     it('create → get → update → delete', async () => {
+      const wfOwner = await new UserFactory(orm.em).createOne({
+        name: 'WF Owner',
+        email: 'wf-owner@acme.com',
+        role: 'admin',
+      });
+
       const created = await request(app.getHttpServer())
         .post('/enterprises')
-        .send({ name: 'Workflow Co.', legalId: 'WF-1' })
+        .send({ name: 'Workflow Co.', legalId: 'WF-1', ownerId: wfOwner.id })
         .expect(201);
 
       const id = created.body.id;

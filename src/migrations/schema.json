@@ -187,6 +187,23 @@
           "enumItems": [],
           "mappedType": "string"
         },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamptz(6)",
@@ -215,6 +232,14 @@
           "unique": true
         },
         {
+          "columnNames": ["owner_id"],
+          "composite": false,
+          "constraint": true,
+          "keyName": "enterprises_owner_id_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
           "columnNames": ["id"],
           "composite": false,
           "constraint": true,
@@ -225,7 +250,15 @@
       ],
       "checks": [],
       "triggers": [],
-      "foreignKeys": {},
+      "foreignKeys": {
+        "enterprises_owner_id_foreign": {
+          "columnNames": ["owner_id"],
+          "constraintName": "enterprises_owner_id_foreign",
+          "localTableName": "public.enterprises",
+          "referencedColumnNames": ["id"],
+          "referencedTableName": "public.users"
+        }
+      },
       "comment": null
     },
     {
@@ -501,23 +534,6 @@
           "enumItems": [],
           "mappedType": "string"
         },
-        "enterprise_id": {
-          "name": "enterprise_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
         "id": {
           "name": "id",
           "type": "uuid",
@@ -607,15 +623,7 @@
       ],
       "checks": [],
       "triggers": [],
-      "foreignKeys": {
-        "users_enterprise_id_foreign": {
-          "columnNames": ["enterprise_id"],
-          "constraintName": "users_enterprise_id_foreign",
-          "localTableName": "public.users",
-          "referencedColumnNames": ["id"],
-          "referencedTableName": "public.enterprises"
-        }
-      },
+      "foreignKeys": {},
       "comment": null
     }
   ],
