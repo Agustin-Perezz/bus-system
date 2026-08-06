@@ -10,6 +10,9 @@ export class GetEnterpriseResponseDto {
   @ApiProperty({ description: 'Legal ID' })
   legalId: string;
 
+  @ApiProperty({ description: 'Owner user ID' })
+  ownerId: string;
+
   @ApiProperty({ description: 'Creation timestamp' })
   createdAt: Date;
 

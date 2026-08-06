@@ -17,15 +17,6 @@ export class UpdateUserUseCase {
       throw new NotFoundException('User not found');
     }
 
-    if (dto.enterpriseId !== undefined) {
-      const enterprise = await this.repository.findEnterpriseById(dto.enterpriseId);
-      if (!enterprise) {
-        throw new NotFoundException('Enterprise not found');
-      }
-      user.updateEnterpriseId(dto.enterpriseId);
-    }
-
-    // Email uniqueness check when email is being changed
     if (dto.email !== undefined && dto.email !== user.email) {
       const emailExists = await this.repository.existsByEmail(dto.email);
       if (emailExists) {
@@ -48,7 +39,6 @@ export class UpdateUserUseCase {
       name: updated.name,
       email: updated.email,
       role: updated.role,
-      enterpriseId: updated.enterpriseId,
       createdAt: updated.createdAt,
       updatedAt: updated.updatedAt,
     });

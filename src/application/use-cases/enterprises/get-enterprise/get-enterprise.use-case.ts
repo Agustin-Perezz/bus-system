@@ -20,6 +20,7 @@ export class GetEnterpriseUseCase {
       id: enterprise.id,
       name: enterprise.name,
       legalId: enterprise.legalId,
+      ownerId: enterprise.ownerId,
       createdAt: enterprise.createdAt,
       updatedAt: enterprise.updatedAt,
     });

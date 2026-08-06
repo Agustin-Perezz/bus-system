@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsIn, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsEmail, IsIn, IsOptional, IsString } from 'class-validator';
 
 import { USER_ROLES, type UserRole } from '../../../../domain/entities/user.entity';
 
@@ -18,9 +18,4 @@ export class UpdateUserRequestDto {
   @IsOptional()
   @IsIn(USER_ROLES)
   role?: UserRole;
-
-  @ApiPropertyOptional({ description: 'Enterprise ID' })
-  @IsOptional()
-  @IsUUID()
-  enterpriseId?: string;
 }
