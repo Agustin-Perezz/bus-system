@@ -1,6 +1,6 @@
-# Books API - Documentation
+# Bus System - Documentation
 
-> REST API for managing books, built with NestJS and Clean Architecture
+> REST API for a bus transportation system, built with NestJS and Clean Architecture
 
 ## Table of Contents
 
@@ -8,7 +8,7 @@
 |---|----------|-------------|
 | 00 | [INDEX](00_INDEX.md) | This file - general index |
 | 01 | [ARCHITECTURE](01_ARCHITECTURE.md) | Clean Architecture overview |
-| 02 | [ENTITIES](02_ENTITIES.md) | Domain entities (Book) |
+| 02 | [ENTITIES](02_ENTITIES.md) | Domain entities (Enterprise, Route, User, Bus, Trip) |
 | 03 | [USE_CASES](03_USE_CASES.md) | Complete use case catalog |
 | 04 | [API](04_API.md) | REST endpoints and Swagger documentation |
 | 07 | [TESTING](07_TESTING.md) | Testing guide (unit + e2e) |
@@ -20,15 +20,15 @@
 ```mermaid
 graph TB
     subgraph Presentation
-        C_B[Books Controller]
+        C[Controllers]
     end
 
     subgraph Application
-        UC_B[Books Use Cases]
+        UC[Use Cases]
     end
 
     subgraph Domain
-        E_B[Book]
+        E[Enterprise / Route / User / Bus / Trip]
     end
 
     subgraph Infrastructure
@@ -36,8 +36,8 @@ graph TB
         REP[Repositories]
     end
 
-    C_B --> UC_B
-    UC_B --> E_B
+    C --> UC
+    UC --> E
     REP --> DB
 ```
 
