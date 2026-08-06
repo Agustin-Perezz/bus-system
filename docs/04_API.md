@@ -25,9 +25,9 @@ Five resources, each with full CRUD:
 
 | Resource | Base path | Description | FK |
 |----------|-----------|-------------|----|
-| Enterprise | `/enterprises` | Bus companies | — |
+| Enterprise | `/enterprises` | Bus companies | `ownerId` → User |
 | Route | `/routes` | Travel routes between terminals | — |
-| User | `/users` | People employed by an enterprise | `enterpriseId` → Enterprise |
+| User | `/users` | People (may own an enterprise) | — |
 | Bus | `/buses` | Vehicles owned by an enterprise | `enterpriseId` → Enterprise |
 | Trip | `/trips` | Scheduled departures on a route | `routeId` → Route |
 
@@ -63,10 +63,11 @@ Returns `{ items: [...], total, limit, offset }`.
 ### Enterprise
 
 ```json
-{ "name": "Acme Bus Co.", "legalId": "US-12-3456789" }
+{ "name": "Acme Bus Co.", "legalId": "US-12-3456789", "ownerId": "<uuid>" }
 ```
 
 - `legalId` is immutable after creation.
+- `ownerId` must reference an existing user (404 if missing). Each user can own at most one enterprise (unique constraint).
 
 ### Route
 
@@ -77,12 +78,14 @@ Returns `{ items: [...], total, limit, offset }`.
 ### User
 
 ```json
-{ "name": "Jane Driver", "email": "jane@acme.com", "role": "driver", "enterpriseId": "<uuid>" }
+{ "name": "Jane Driver", "email": "jane@acme.com", "role": "driver" }
 ```
 
 - `email` must be unique.
 - `role` must be one of `admin`, `driver`, `user`.
-- `enterpriseId` must reference an existing enterprise (404 if missing).
+
+A user may own an enterprise; the ownership relation is created from the
+Enterprise side (`POST /enterprises` with `ownerId`).
 
 ### Bus
 
