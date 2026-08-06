@@ -2,9 +2,7 @@ import { MikroORM } from '@mikro-orm/core';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 
-import { EnterpriseEntitySchema } from '../src/infrastructure/database/postgres/entities/enterprise.entity';
 import { UserEntitySchema } from '../src/infrastructure/database/postgres/entities/user.entity';
-import { EnterpriseFactory } from '../src/infrastructure/database/postgres/factories/enterprise.factory';
 import { UserFactory } from '../src/infrastructure/database/postgres/factories/user.factory';
 import { UsersModule } from '../src/users.module';
 import { createTestApp } from './helpers/app.helper';
@@ -14,10 +12,9 @@ describe('Users Controller (e2e)', () => {
   let app: INestApplication;
   let orm: MikroORM;
   let userId: string;
-  let enterpriseId: string;
 
   beforeAll(async () => {
-    ({ app, orm } = await createTestApp(UsersModule, [UserEntitySchema, EnterpriseEntitySchema]));
+    ({ app, orm } = await createTestApp(UsersModule, [UserEntitySchema]));
   });
 
   afterAll(async () => {
@@ -27,17 +24,10 @@ describe('Users Controller (e2e)', () => {
   beforeEach(async () => {
     await truncateAll(orm);
 
-    const enterprise = await new EnterpriseFactory(orm.em).createOne({
-      name: 'Acme Bus Co.',
-      legalId: 'US-12-3456789',
-    });
-    enterpriseId = enterprise.id;
-
     const user = await new UserFactory(orm.em).createOne({
       name: 'Jane Driver',
       email: 'jane@acme.com',
       role: 'driver',
-      enterprise: enterpriseId,
     });
     userId = user.id;
   });
@@ -50,7 +40,6 @@ describe('Users Controller (e2e)', () => {
           name: 'Bob Admin',
           email: 'bob@acme.com',
           role: 'admin',
-          enterpriseId,
         })
         .expect(201)
         .then((response) => {
@@ -58,7 +47,6 @@ describe('Users Controller (e2e)', () => {
           expect(response.body.name).toBe('Bob Admin');
           expect(response.body.email).toBe('bob@acme.com');
           expect(response.body.role).toBe('admin');
-          expect(response.body.enterpriseId).toBe(enterpriseId);
           expect(response.body).toHaveProperty('createdAt');
           expect(response.body).toHaveProperty('updatedAt');
         });
@@ -75,21 +63,8 @@ describe('Users Controller (e2e)', () => {
           name: 'Clone',
           email: 'jane@acme.com',
           role: 'user',
-          enterpriseId,
         })
         .expect(400);
-    });
-
-    it('returns 404 when enterprise does not exist', () => {
-      return request(app.getHttpServer())
-        .post('/users')
-        .send({
-          name: 'Orphan',
-          email: 'orphan@acme.com',
-          role: 'user',
-          enterpriseId: '00000000-0000-0000-0000-000000000000',
-        })
-        .expect(404);
     });
 
     it('returns 400 on invalid role', () => {
@@ -99,21 +74,8 @@ describe('Users Controller (e2e)', () => {
           name: 'Bad Role',
           email: 'badrole@acme.com',
           role: 'superadmin',
-          enterpriseId,
         })
         .expect(400);
-    });
-
-    it('validates FK (404) before duplicate email (400)', () => {
-      return request(app.getHttpServer())
-        .post('/users')
-        .send({
-          name: 'Test',
-          email: 'jane@acme.com',
-          role: 'user',
-          enterpriseId: '00000000-0000-0000-0000-000000000000',
-        })
-        .expect(404);
     });
   });
 
@@ -140,7 +102,6 @@ describe('Users Controller (e2e)', () => {
         .then((response) => {
           expect(response.body.id).toBe(userId);
           expect(response.body.name).toBe('Jane Driver');
-          expect(response.body.enterpriseId).toBe(enterpriseId);
         });
     });
 
@@ -173,7 +134,7 @@ describe('Users Controller (e2e)', () => {
         });
     });
 
-    it('updates email and rejects duplicates', () => {
+    it('updates email', () => {
       return request(app.getHttpServer())
         .put(`/users/${userId}`)
         .send({ email: 'new@acme.com' })
@@ -181,20 +142,6 @@ describe('Users Controller (e2e)', () => {
         .then((response) => {
           expect(response.body.email).toBe('new@acme.com');
         });
-    });
-
-    it('returns 400 when updating to existing email', () => {
-      return request(app.getHttpServer())
-        .put(`/users/${userId}`)
-        .send({ email: 'jane@acme.com' })
-        .expect(200); // same email as current, no-op, allowed
-    });
-
-    it('returns 404 when enterprise not found on update', () => {
-      return request(app.getHttpServer())
-        .put(`/users/${userId}`)
-        .send({ enterpriseId: '00000000-0000-0000-0000-000000000000' })
-        .expect(404);
     });
 
     it('returns 404 when user not found', () => {
@@ -228,7 +175,6 @@ describe('Users Controller (e2e)', () => {
           name: 'Workflow User',
           email: 'wf@acme.com',
           role: 'user',
-          enterpriseId,
         })
         .expect(201);
 

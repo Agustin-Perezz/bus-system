@@ -5,8 +5,10 @@ import request from 'supertest';
 import { BusesModule } from '../src/buses.module';
 import { BusEntitySchema } from '../src/infrastructure/database/postgres/entities/bus.entity';
 import { EnterpriseEntitySchema } from '../src/infrastructure/database/postgres/entities/enterprise.entity';
+import { UserEntitySchema } from '../src/infrastructure/database/postgres/entities/user.entity';
 import { BusFactory } from '../src/infrastructure/database/postgres/factories/bus.factory';
 import { EnterpriseFactory } from '../src/infrastructure/database/postgres/factories/enterprise.factory';
+import { UserFactory } from '../src/infrastructure/database/postgres/factories/user.factory';
 import { createTestApp } from './helpers/app.helper';
 import { truncateAll } from './helpers/database.helper';
 
@@ -17,7 +19,11 @@ describe('Buses Controller (e2e)', () => {
   let enterpriseId: string;
 
   beforeAll(async () => {
-    ({ app, orm } = await createTestApp(BusesModule, [BusEntitySchema, EnterpriseEntitySchema]));
+    ({ app, orm } = await createTestApp(BusesModule, [
+      BusEntitySchema,
+      EnterpriseEntitySchema,
+      UserEntitySchema,
+    ]));
   });
 
   afterAll(async () => {
@@ -27,9 +33,16 @@ describe('Buses Controller (e2e)', () => {
   beforeEach(async () => {
     await truncateAll(orm);
 
+    const owner = await new UserFactory(orm.em).createOne({
+      name: 'Jane Owner',
+      email: 'jane@acme.com',
+      role: 'admin',
+    });
+
     const enterprise = await new EnterpriseFactory(orm.em).createOne({
       name: 'Acme Bus Co.',
       legalId: 'US-12-3456789',
+      owner: owner.id,
     });
     enterpriseId = enterprise.id;
 
