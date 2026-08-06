@@ -14,15 +14,11 @@ export class GetEnterpriseRepository implements IGetEnterpriseRepository {
   ) {}
 
   async findById(id: string): Promise<Enterprise | null> {
-    try {
-      const entity = await this.repository.findOne({ id });
-      if (!entity) {
-        return null;
-      }
-      return this.toDomain(entity);
-    } catch {
+    const entity = await this.repository.findOne({ id });
+    if (!entity) {
       return null;
     }
+    return this.toDomain(entity);
   }
 
   private toDomain(entity: EnterpriseEntity): Enterprise {
@@ -30,6 +26,7 @@ export class GetEnterpriseRepository implements IGetEnterpriseRepository {
       id: entity.id,
       name: entity.name,
       legalId: entity.legalId,
+      ownerId: entity.owner,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });

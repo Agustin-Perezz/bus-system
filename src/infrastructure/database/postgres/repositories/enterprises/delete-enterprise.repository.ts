@@ -35,6 +35,7 @@ export class DeleteEnterpriseRepository implements IDeleteEnterpriseRepository {
       id: entity.id,
       name: entity.name,
       legalId: entity.legalId,
+      ownerId: entity.owner,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });
