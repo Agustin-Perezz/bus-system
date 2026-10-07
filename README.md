@@ -1,7 +1,7 @@
 # Bus System
 
-[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_bus-system&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_bus-system)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_bus-system&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_bus-system)
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_bus-system4&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_bus-system4)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_bus-system4&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_bus-system4)
 
 REST API for a bus transportation system, built with NestJS and Clean
 Architecture. Manages enterprises, routes, users, buses, and trips.
