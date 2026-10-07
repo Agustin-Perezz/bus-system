@@ -1,7 +1,7 @@
 # Bus System
 
-[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_bus-system&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_bus-system)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_bus-system&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_bus-system)
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_bus-system4&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_bus-system4)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_bus-system4&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_bus-system4)
 
 REST API for a bus transportation system, built with NestJS and Clean
 Architecture. Manages enterprises, routes, users, buses, and trips.
@@ -124,7 +124,7 @@ pnpm docker:logs    # View logs
 | `DB_PORT` | PostgreSQL port | 5432 |
 | `DB_USERNAME` | PostgreSQL user | postgres |
 | `DB_PASSWORD` | PostgreSQL password | postgres |
-| `DB_NAME` | Database name | books |
+| `DB_NAME` | Database name | bus_system |
 | `PORT` | API port | 3000 |
 | `NODE_ENV` | Environment (development/production) | development |
 | `SENTRY_DSN` | Sentry DSN (only sent in production) | - |
