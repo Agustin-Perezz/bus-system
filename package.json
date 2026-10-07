@@ -1,11 +1,12 @@
 {
-  "name": "scafolld-nestjs",
+  "name": "bus-system",
   "version": "1.0.0",
-  "description": "Sistema de renta de autos con NestJS y Clean Architecture",
+  "description": "Bus transportation management REST API with NestJS and Clean Architecture",
   "main": "dist/main.js",
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "build": "nest build",
+    "typecheck": "tsc --noEmit",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main",
