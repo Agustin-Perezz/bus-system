@@ -11,7 +11,7 @@ import { TripEntitySchema } from './src/infrastructure/database/postgres/entitie
 import { UserEntitySchema } from './src/infrastructure/database/postgres/entities/user.entity';
 
 export const ormConfig = defineConfig({
-  clientUrl: `postgresql://${process.env.DB_USERNAME || 'postgres'}:${process.env.DB_PASSWORD || 'postgres'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}/${process.env.DB_NAME || 'books'}`,
+  clientUrl: `postgresql://${process.env.DB_USERNAME || 'postgres'}:${process.env.DB_PASSWORD || 'postgres'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}/${process.env.DB_NAME || 'bus_system'}`,
   entities: [
     EnterpriseEntitySchema,
     RouteEntitySchema,

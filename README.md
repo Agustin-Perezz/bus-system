@@ -124,7 +124,7 @@ pnpm docker:logs    # View logs
 | `DB_PORT` | PostgreSQL port | 5432 |
 | `DB_USERNAME` | PostgreSQL user | postgres |
 | `DB_PASSWORD` | PostgreSQL password | postgres |
-| `DB_NAME` | Database name | books |
+| `DB_NAME` | Database name | bus_system |
 | `PORT` | API port | 3000 |
 | `NODE_ENV` | Environment (development/production) | development |
 | `SENTRY_DSN` | Sentry DSN (only sent in production) | - |
