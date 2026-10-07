@@ -33,11 +33,11 @@ HTTP stack on an in-memory SQLite database. Neither layer needs PostgreSQL.
 graph TB
     subgraph TestEnvironment
         JEST[Jest 30]
-        SWC[SWC / @swc/jest]
+        SWC["SWC / @swc/jest"]
         SUPER[Supertest]
         MIKRO[MikroORM 7]
         FAKER[Faker]
-        SEEDER[@mikro-orm/seeder]
+        SEEDER["@mikro-orm/seeder"]
     end
 
     subgraph Database
@@ -58,7 +58,7 @@ graph TB
     JEST --> UNIT
     JEST --> BOOKSPEC
     JEST --> E2E
-    ```
+```
 
 ## Jest configs
 
