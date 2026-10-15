@@ -12,6 +12,9 @@ export class BusResponseDto {
   @ApiProperty({ description: 'Enterprise ID' })
   enterpriseId: string;
 
+  @ApiProperty({ description: 'Bus layout template ID' })
+  layoutId: string;
+
   @ApiProperty({ description: 'Creation timestamp' })
   createdAt: Date;
 

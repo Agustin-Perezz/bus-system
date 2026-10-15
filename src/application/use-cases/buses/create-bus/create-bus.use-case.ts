@@ -18,13 +18,23 @@ export class CreateBusUseCase {
       throw new NotFoundException('Enterprise not found');
     }
 
-    const bus = Bus.create({ model: dto.model, enterpriseId: dto.enterpriseId });
+    const layout = await this.repository.findLayoutById(dto.layoutId);
+    if (!layout) {
+      throw new NotFoundException('Bus layout not found');
+    }
+
+    const bus = Bus.create({
+      model: dto.model,
+      enterpriseId: dto.enterpriseId,
+      layoutId: dto.layoutId,
+    });
     const created = await this.repository.create(bus);
 
     return new CreateBusResponseDto({
       id: created.id,
       model: created.model,
       enterpriseId: created.enterpriseId,
+      layoutId: created.layoutId,
       createdAt: created.createdAt,
       updatedAt: created.updatedAt,
     });

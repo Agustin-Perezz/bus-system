@@ -25,6 +25,7 @@ export class ListBusesRepository implements IListBusesRepository {
       id: entity.id,
       model: entity.model,
       enterpriseId: entity.enterprise,
+      layoutId: entity.layout,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });

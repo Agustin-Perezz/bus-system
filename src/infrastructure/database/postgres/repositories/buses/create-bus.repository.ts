@@ -4,8 +4,10 @@ import { Injectable } from '@nestjs/common';
 
 import { ICreateBusRepository } from '../../../../../application/use-cases/buses/create-bus/create-bus.repository.interface';
 import { Bus } from '../../../../../domain/entities/bus.entity';
+import { BusLayout } from '../../../../../domain/entities/bus-layout.entity';
 import { Enterprise } from '../../../../../domain/entities/enterprise.entity';
 import { BusEntity } from '../../entities/bus.entity';
+import { BusLayoutEntity } from '../../entities/bus-layout.entity';
 import { EnterpriseEntity } from '../../entities/enterprise.entity';
 
 @Injectable()
@@ -15,11 +17,13 @@ export class CreateBusRepository implements ICreateBusRepository {
     private readonly repository: EntityRepository<BusEntity>,
     @InjectRepository(EnterpriseEntity)
     private readonly enterpriseRepository: EntityRepository<EnterpriseEntity>,
+    @InjectRepository(BusLayoutEntity)
+    private readonly layoutRepository: EntityRepository<BusLayoutEntity>,
   ) {}
 
   async create(bus: Bus): Promise<Bus> {
     return this.repository.getEntityManager().transactional(async (em) => {
-      const entity = new BusEntity(bus.model, bus.enterpriseId);
+      const entity = new BusEntity(bus.model, bus.enterpriseId, bus.layoutId);
       entity.id = bus.id;
       entity.createdAt = bus.createdAt;
       entity.updatedAt = bus.updatedAt;
@@ -38,6 +42,20 @@ export class CreateBusRepository implements ICreateBusRepository {
       name: entity.name,
       legalId: entity.legalId,
       ownerId: entity.owner,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    });
+  }
+
+  async findLayoutById(id: string): Promise<BusLayout | null> {
+    const entity = await this.layoutRepository.findOne({ id });
+    if (!entity) {
+      return null;
+    }
+    return BusLayout.reconstruct({
+      id: entity.id,
+      name: entity.name,
+      layoutGrid: entity.layoutGrid,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });
