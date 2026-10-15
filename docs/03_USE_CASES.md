@@ -49,6 +49,7 @@ These rules apply to every use case in this document.
 - An update operation changes only the fields present in the request body.
   The operation bumps `updatedAt` when it changes data.
 - A `Bus` references an `Enterprise` through `enterpriseId`.
+- A `Bus` references a `BusLayout` through `layoutId`.
 - An `Enterprise` references a `User` through `ownerId`.
 - A `Trip` references a `Route` through `routeId`.
 - A `Route` has no foreign key.
@@ -71,12 +72,16 @@ export class CreateBusRequestDto {
 
     @IsUUID()
     enterpriseId: string;
+
+    @IsUUID()
+    layoutId: string;
 }
 ```
 
 ### Business Rules
 
 - The `enterpriseId` must reference an existing enterprise
+- The `layoutId` must reference an existing bus layout template
 - The enterprise check runs before all other rules
 
 ### Error Cases
@@ -84,6 +89,7 @@ export class CreateBusRequestDto {
 | Condition | Exception |
 |-----------|-----------|
 | Enterprise not found | `NotFoundException` (404) |
+| Bus layout not found | `NotFoundException` (404) |
 | Invalid input | `BadRequestException` (400) |
 
 ---

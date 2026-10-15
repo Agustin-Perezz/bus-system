@@ -3,26 +3,31 @@ import { BaseEntity, type BaseEntityProps, generateBaseEntityProps } from './bas
 export interface BusProperties extends BaseEntityProps {
   model: string;
   enterpriseId: string;
+  layoutId: string;
 }
 
 export interface CreateBusParams {
   model: string;
   enterpriseId: string;
+  layoutId: string;
 }
 
 export interface ReconstructBusParams extends BaseEntityProps {
   model: string;
   enterpriseId: string;
+  layoutId: string;
 }
 
 export class Bus extends BaseEntity {
   private _model: string;
   private _enterpriseId: string;
+  private _layoutId: string;
 
   private constructor(props: BusProperties) {
     super(props);
     this._model = props.model;
     this._enterpriseId = props.enterpriseId;
+    this._layoutId = props.layoutId;
   }
 
   static create(params: CreateBusParams): Bus {
@@ -30,6 +35,7 @@ export class Bus extends BaseEntity {
       ...generateBaseEntityProps(),
       model: params.model,
       enterpriseId: params.enterpriseId,
+      layoutId: params.layoutId,
     });
   }
 
@@ -43,6 +49,10 @@ export class Bus extends BaseEntity {
 
   get enterpriseId(): string {
     return this._enterpriseId;
+  }
+
+  get layoutId(): string {
+    return this._layoutId;
   }
 
   updateModel(model: string): void {

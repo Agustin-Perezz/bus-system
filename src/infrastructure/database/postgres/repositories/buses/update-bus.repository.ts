@@ -59,6 +59,7 @@ export class UpdateBusRepository implements IUpdateBusRepository {
       id: entity.id,
       model: entity.model,
       enterpriseId: entity.enterprise,
+      layoutId: entity.layout,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });

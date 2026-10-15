@@ -1,6 +1,7 @@
 import { defineEntity, p } from '@mikro-orm/core';
 
 import { BaseEntity } from './base.entity';
+import { BusLayoutEntitySchema } from './bus-layout.entity';
 import { EnterpriseEntitySchema } from './enterprise.entity';
 
 const BusEntitySchema = defineEntity({
@@ -10,14 +11,16 @@ const BusEntitySchema = defineEntity({
   properties: {
     model: p.string(),
     enterprise: () => p.manyToOne(EnterpriseEntitySchema).mapToPk(),
+    layout: () => p.manyToOne(BusLayoutEntitySchema).mapToPk(),
   },
 });
 
 export class BusEntity extends BusEntitySchema.class {
-  constructor(model: string, enterpriseId: string) {
+  constructor(model: string, enterpriseId: string, layoutId: string) {
     super();
     this.model = model;
     this.enterprise = enterpriseId;
+    this.layout = layoutId;
   }
 }
 

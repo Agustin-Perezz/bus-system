@@ -35,6 +35,7 @@ export class UpdateBusUseCase {
       id: updated.id,
       model: updated.model,
       enterpriseId: updated.enterpriseId,
+      layoutId: updated.layoutId,
       createdAt: updated.createdAt,
       updatedAt: updated.updatedAt,
     });

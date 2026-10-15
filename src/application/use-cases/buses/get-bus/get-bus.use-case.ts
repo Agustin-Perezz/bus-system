@@ -20,6 +20,7 @@ export class GetBusUseCase {
       id: bus.id,
       model: bus.model,
       enterpriseId: bus.enterpriseId,
+      layoutId: bus.layoutId,
       createdAt: bus.createdAt,
       updatedAt: bus.updatedAt,
     });

@@ -44,7 +44,7 @@ export class BusesController {
     type: CreateBusResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Invalid data' })
-  @ApiResponse({ status: 404, description: 'Enterprise not found' })
+  @ApiResponse({ status: 404, description: 'Enterprise or bus layout not found' })
   async create(@Body() dto: CreateBusRequestDto): Promise<CreateBusResponseDto> {
     return this.createBusUseCase.execute(dto);
   }

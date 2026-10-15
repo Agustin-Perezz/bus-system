@@ -28,7 +28,7 @@ Five resources, each with full CRUD:
 | Enterprise | `/enterprises` | Bus companies | `ownerId` → User |
 | Route | `/routes` | Travel routes between terminals | — |
 | User | `/users` | People (may own an enterprise) | — |
-| Bus | `/buses` | Vehicles owned by an enterprise | `enterpriseId` → Enterprise |
+| Bus | `/buses` | Vehicles owned by an enterprise | `enterpriseId` → Enterprise, `layoutId` → BusLayout |
 | Trip | `/trips` | Scheduled departures on a route | `routeId` → Route |
 
 ---
@@ -90,10 +90,23 @@ Enterprise side (`POST /enterprises` with `ownerId`).
 ### Bus
 
 ```json
-{ "model": "Mercedes-Benz O500", "enterpriseId": "<uuid>" }
+{ "model": "Mercedes-Benz O500", "enterpriseId": "<uuid>", "layoutId": "<uuid>" }
 ```
 
 - `enterpriseId` must reference an existing enterprise (404 if missing).
+- `layoutId` must reference an existing bus layout template (404 if missing).
+
+Bus layout templates are stored in `bus_layouts` as reusable JSON blueprints
+and are not a REST resource; the database protects templates that are
+assigned to a bus from deletion. Two templates are seeded: the standard 2x2
+single-deck (aisle and bathroom) and a double-decker variant.
+
+Every layout node carries `id`, `label`, `type` (`seat` | `aisle` |
+`bathroom` | `stairs`), `level`, `row`, and `column`. Single-deck layouts
+have `levels: 1` with seat ids like `1A`. Double-deck layouts have
+`levels: 2` and deck-prefixed seat ids (`L1A` lower, `U1A` upper) so ids
+stay unique across the whole layout, while `label` repeats per deck
+(`1A`) for display.
 
 ### Trip
 

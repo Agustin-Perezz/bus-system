@@ -2,10 +2,11 @@ import { Bus } from './bus.entity';
 
 describe('Bus Entity', () => {
   describe('create', () => {
-    it('creates a bus with model, enterpriseId and base entity props', () => {
+    it('creates a bus with model, enterpriseId, layoutId and base entity props', () => {
       const bus = Bus.create({
         model: 'Mercedes-Benz O500',
         enterpriseId: '0193b1a0-0000-7bbb-8bbb-000000000001',
+        layoutId: '0193b1a0-0000-7bbb-8bbb-000000000010',
       });
 
       expect(bus.id).toMatch(
@@ -13,6 +14,7 @@ describe('Bus Entity', () => {
       );
       expect(bus.model).toBe('Mercedes-Benz O500');
       expect(bus.enterpriseId).toBe('0193b1a0-0000-7bbb-8bbb-000000000001');
+      expect(bus.layoutId).toBe('0193b1a0-0000-7bbb-8bbb-000000000010');
       expect(bus.createdAt).toBeInstanceOf(Date);
       expect(bus.updatedAt).toBeInstanceOf(Date);
       expect(bus.createdAt.getTime()).toBe(bus.updatedAt.getTime());
@@ -29,6 +31,7 @@ describe('Bus Entity', () => {
         id,
         model: 'Volvo 9700',
         enterpriseId: '0193b1a0-0000-7bbb-8bbb-000000000002',
+        layoutId: '0193b1a0-0000-7bbb-8bbb-000000000020',
         createdAt,
         updatedAt,
       });
@@ -38,6 +41,7 @@ describe('Bus Entity', () => {
       expect(bus.updatedAt).toBe(updatedAt);
       expect(bus.model).toBe('Volvo 9700');
       expect(bus.enterpriseId).toBe('0193b1a0-0000-7bbb-8bbb-000000000002');
+      expect(bus.layoutId).toBe('0193b1a0-0000-7bbb-8bbb-000000000020');
     });
   });
 
@@ -46,6 +50,7 @@ describe('Bus Entity', () => {
       const bus = Bus.create({
         model: 'Old',
         enterpriseId: '0193b1a0-0000-7bbb-8bbb-000000000001',
+        layoutId: '0193b1a0-0000-7bbb-8bbb-000000000010',
       });
       const originalUpdatedAt = bus.updatedAt;
 
@@ -59,7 +64,11 @@ describe('Bus Entity', () => {
 
   describe('updateEnterpriseId', () => {
     it('mutates enterpriseId and advances updatedAt', async () => {
-      const bus = Bus.create({ model: 'M', enterpriseId: '0193b1a0-0000-7bbb-8bbb-000000000001' });
+      const bus = Bus.create({
+        model: 'M',
+        enterpriseId: '0193b1a0-0000-7bbb-8bbb-000000000001',
+        layoutId: '0193b1a0-0000-7bbb-8bbb-000000000010',
+      });
       const originalUpdatedAt = bus.updatedAt;
 
       await new Promise((r) => setTimeout(r, 5));

@@ -4,9 +4,11 @@ import request from 'supertest';
 
 import { BusesModule } from '../src/buses.module';
 import { BusEntitySchema } from '../src/infrastructure/database/postgres/entities/bus.entity';
+import { BusLayoutEntitySchema } from '../src/infrastructure/database/postgres/entities/bus-layout.entity';
 import { EnterpriseEntitySchema } from '../src/infrastructure/database/postgres/entities/enterprise.entity';
 import { UserEntitySchema } from '../src/infrastructure/database/postgres/entities/user.entity';
 import { BusFactory } from '../src/infrastructure/database/postgres/factories/bus.factory';
+import { BusLayoutFactory } from '../src/infrastructure/database/postgres/factories/bus-layout.factory';
 import { EnterpriseFactory } from '../src/infrastructure/database/postgres/factories/enterprise.factory';
 import { UserFactory } from '../src/infrastructure/database/postgres/factories/user.factory';
 import { createTestApp } from './helpers/app.helper';
@@ -17,10 +19,12 @@ describe('Buses Controller (e2e)', () => {
   let orm: MikroORM;
   let busId: string;
   let enterpriseId: string;
+  let layoutId: string;
 
   beforeAll(async () => {
     ({ app, orm } = await createTestApp(BusesModule, [
       BusEntitySchema,
+      BusLayoutEntitySchema,
       EnterpriseEntitySchema,
       UserEntitySchema,
     ]));
@@ -46,9 +50,13 @@ describe('Buses Controller (e2e)', () => {
     });
     enterpriseId = enterprise.id;
 
+    const layout = await new BusLayoutFactory(orm.em).createOne();
+    layoutId = layout.id;
+
     const bus = await new BusFactory(orm.em).createOne({
       model: 'Mercedes-Benz O500',
       enterprise: enterpriseId,
+      layout: layoutId,
     });
     busId = bus.id;
   });
@@ -57,12 +65,13 @@ describe('Buses Controller (e2e)', () => {
     it('creates a bus correctly', () => {
       return request(app.getHttpServer())
         .post('/buses')
-        .send({ model: 'Volvo 9700', enterpriseId })
+        .send({ model: 'Volvo 9700', enterpriseId, layoutId })
         .expect(201)
         .then((response) => {
           expect(response.body).toHaveProperty('id');
           expect(response.body.model).toBe('Volvo 9700');
           expect(response.body.enterpriseId).toBe(enterpriseId);
+          expect(response.body.layoutId).toBe(layoutId);
           expect(response.body).toHaveProperty('createdAt');
           expect(response.body).toHaveProperty('updatedAt');
         });
@@ -71,7 +80,7 @@ describe('Buses Controller (e2e)', () => {
     it('returns 400 when required fields are missing', () => {
       return request(app.getHttpServer())
         .post('/buses')
-        .send({ model: 'No Enterprise' })
+        .send({ model: 'No Enterprise', enterpriseId })
         .expect(400);
     });
 
@@ -81,8 +90,31 @@ describe('Buses Controller (e2e)', () => {
         .send({
           model: 'Orphan Bus',
           enterpriseId: '00000000-0000-0000-0000-000000000000',
+          layoutId,
         })
         .expect(404);
+    });
+
+    it('returns 404 when bus layout does not exist', () => {
+      return request(app.getHttpServer())
+        .post('/buses')
+        .send({
+          model: 'Orphan Bus',
+          enterpriseId,
+          layoutId: '00000000-0000-0000-0000-000000000000',
+        })
+        .expect(404);
+    });
+
+    it('returns 400 when layoutId is not a valid UUID', () => {
+      return request(app.getHttpServer())
+        .post('/buses')
+        .send({
+          model: 'Invalid Layout Bus',
+          enterpriseId,
+          layoutId: 'not-a-uuid',
+        })
+        .expect(400);
     });
   });
 
@@ -94,6 +126,7 @@ describe('Buses Controller (e2e)', () => {
         .then((response) => {
           expect(response.body.buses).toHaveLength(1);
           expect(response.body.buses[0].model).toBe('Mercedes-Benz O500');
+          expect(response.body.buses[0].layoutId).toBe(layoutId);
           expect(response.body.total).toBe(1);
           expect(response.body.limit).toBe(10);
           expect(response.body.offset).toBe(0);
@@ -110,6 +143,7 @@ describe('Buses Controller (e2e)', () => {
           expect(response.body.id).toBe(busId);
           expect(response.body.model).toBe('Mercedes-Benz O500');
           expect(response.body.enterpriseId).toBe(enterpriseId);
+          expect(response.body.layoutId).toBe(layoutId);
         });
     });
 
@@ -129,6 +163,7 @@ describe('Buses Controller (e2e)', () => {
         .then((response) => {
           expect(response.body.model).toBe('Mercedes-Benz O500R');
           expect(response.body.enterpriseId).toBe(enterpriseId);
+          expect(response.body.layoutId).toBe(layoutId);
         });
     });
 
@@ -137,6 +172,16 @@ describe('Buses Controller (e2e)', () => {
         .put(`/buses/${busId}`)
         .send({ enterpriseId: '00000000-0000-0000-0000-000000000000' })
         .expect(404);
+    });
+
+    it('rejects layoutId on update instead of silently ignoring it', () => {
+      return request(app.getHttpServer())
+        .put(`/buses/${busId}`)
+        .send({ layoutId: '00000000-0000-0000-0000-000000000000' })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.layoutId).toBeUndefined();
+        });
     });
 
     it('returns 404 when bus not found', () => {
@@ -166,7 +211,7 @@ describe('Buses Controller (e2e)', () => {
     it('create → get → update → delete', async () => {
       const created = await request(app.getHttpServer())
         .post('/buses')
-        .send({ model: 'Workflow Bus', enterpriseId })
+        .send({ model: 'Workflow Bus', enterpriseId, layoutId })
         .expect(201);
 
       const id = created.body.id;

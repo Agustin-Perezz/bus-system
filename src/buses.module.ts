@@ -7,6 +7,7 @@ import { GetBusUseCase } from './application/use-cases/buses/get-bus/get-bus.use
 import { ListBusesUseCase } from './application/use-cases/buses/list-buses/list-buses.use-case';
 import { UpdateBusUseCase } from './application/use-cases/buses/update-bus/update-bus.use-case';
 import { BusEntitySchema } from './infrastructure/database/postgres/entities/bus.entity';
+import { BusLayoutEntitySchema } from './infrastructure/database/postgres/entities/bus-layout.entity';
 import { EnterpriseEntitySchema } from './infrastructure/database/postgres/entities/enterprise.entity';
 import { CreateBusRepository } from './infrastructure/database/postgres/repositories/buses/create-bus.repository';
 import { DeleteBusRepository } from './infrastructure/database/postgres/repositories/buses/delete-bus.repository';
@@ -44,6 +45,8 @@ import { BusesController } from './presentation/controllers/buses/buses.controll
     UpdateBusUseCase,
     DeleteBusUseCase,
   ],
-  imports: [MikroOrmModule.forFeature([BusEntitySchema, EnterpriseEntitySchema])],
+  imports: [
+    MikroOrmModule.forFeature([BusEntitySchema, BusLayoutEntitySchema, EnterpriseEntitySchema]),
+  ],
 })
 export class BusesModule {}

@@ -11,6 +11,7 @@ export class BusFactory extends Factory<BusEntity> {
     return {
       model: faker.vehicle.model(),
       enterprise: uuidv7(),
+      layout: uuidv7(),
     };
   }
 }

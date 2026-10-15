@@ -5,6 +5,7 @@ import { defineConfig } from '@mikro-orm/postgresql';
 import { SeedManager } from '@mikro-orm/seeder';
 
 import { BusEntitySchema } from './src/infrastructure/database/postgres/entities/bus.entity';
+import { BusLayoutEntitySchema } from './src/infrastructure/database/postgres/entities/bus-layout.entity';
 import { EnterpriseEntitySchema } from './src/infrastructure/database/postgres/entities/enterprise.entity';
 import { RouteEntitySchema } from './src/infrastructure/database/postgres/entities/route.entity';
 import { TripEntitySchema } from './src/infrastructure/database/postgres/entities/trip.entity';
@@ -16,6 +17,7 @@ export const ormConfig = defineConfig({
     EnterpriseEntitySchema,
     RouteEntitySchema,
     UserEntitySchema,
+    BusLayoutEntitySchema,
     BusEntitySchema,
     TripEntitySchema,
   ],
@@ -30,6 +32,12 @@ export const ormConfig = defineConfig({
     allOrNothing: true,
     emit: 'ts',
     snapshotName: 'schema',
+  },
+  seeder: {
+    path: 'dist/infrastructure/database/postgres/seeders',
+    pathTs: 'src/infrastructure/database/postgres/seeders',
+    defaultSeeder: 'DatabaseSeeder',
+    fileName: (className: string) => className.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase(),
   },
 });
 
