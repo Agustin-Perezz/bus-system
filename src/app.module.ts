@@ -6,11 +6,20 @@ import { BusesModule } from './buses.module';
 import { EnterprisesModule } from './enterprises.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { RoutesModule } from './routes.module';
+import { TicketsModule } from './tickets.module';
 import { TripsModule } from './trips.module';
 import { UsersModule } from './users.module';
 
 @Module({
-  imports: [DatabaseModule, EnterprisesModule, RoutesModule, UsersModule, BusesModule, TripsModule],
+  imports: [
+    DatabaseModule,
+    EnterprisesModule,
+    RoutesModule,
+    UsersModule,
+    BusesModule,
+    TripsModule,
+    TicketsModule,
+  ],
   providers: [
     {
       provide: APP_FILTER,
