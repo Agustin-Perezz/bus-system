@@ -18,7 +18,6 @@ export class GetTripRepository implements IGetTripRepository {
     private readonly repository: EntityRepository<TripEntity>,
   ) {}
 
-  // Q: This method seems to not be used anymore.
   async findByIdWithBusAndLayout(id: string): Promise<TripWithBusAndLayout | null> {
     try {
       const entity = await this.repository.findOne({ id }, { populate: ['bus.layout'] });
