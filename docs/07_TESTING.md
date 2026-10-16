@@ -149,6 +149,45 @@ describe('Books Controller (e2e)', () => {
 });
 ```
 
+### Asserting a database constraint
+
+Some rules live in the database: a unique index, a foreign key, a check. They
+have no HTTP surface yet. Give each expected failure its own entity manager. A
+failed `flush()` leaves a broken unit of work behind. A forked `em` keeps that
+failure away from the shared one.
+
+Build the rows through the domain entity. Map them to the table the same way
+the future repository maps them. Then the suite exercises the real write path
+instead of writing columns by hand:
+
+```typescript
+// test/tickets.e2e-spec.ts
+async function persistTicket(spec: TicketSpec = {}): Promise<TicketEntity> {
+  const em = orm.em.fork();
+  const entity = toEntity(Ticket.create(ticketParams(spec)), em);
+
+  await em.persist(entity).flush();
+  em.clear();
+
+  return entity;
+}
+
+async function expectSeatTaken(spec: TicketSpec = {}): Promise<void> {
+  await expect(persistTicket(spec)).rejects.toThrow(/unique|constraint/i);
+}
+```
+
+Use raw SQL only when the assertion is about the database itself. The ORM can
+reject the value first: `p.enum` fails an out-of-vocabulary status before SQL.
+To prove the check constraint, insert the row directly.
+
+Match the driver message loosely (`/unique|constraint|check/i`). Postgres and
+SQLite use different words for the same violation. `test/tickets.e2e-spec.ts`
+is the worked example. It covers both active statuses, the freed seat after
+cancellation, the same seat on another trip, the seats of both decks of a
+double-decker layout, the seat that stays blocked while its hold is expired,
+and the status vocabulary at both layers.
+
 ## Unit Test Pattern
 
 Unit tests are pure `import` + `expect` — no Nest `TestingModule`, no

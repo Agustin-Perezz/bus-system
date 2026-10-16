@@ -5,7 +5,7 @@
 
 REST API for a bus transportation system, built with NestJS and Clean
 Architecture. Manages enterprises, routes, users, bus layout templates,
-buses, and trips.
+buses, trips, and seat bookings.
 
 ## Domain Model
 
@@ -16,6 +16,8 @@ erDiagram
     BusLayout ||--o{ Bus : "blueprints"
     Route ||--o{ Trip : "schedules"
     Bus ||--o{ Trip : "operates"
+    Trip ||--o{ Ticket : "reserves"
+    User ||--o{ Ticket : "books"
 
     Enterprise {
         uuid id PK
@@ -51,6 +53,15 @@ erDiagram
         datetime departure_at
         uuid route_id FK
         uuid bus_id FK
+    }
+    Ticket {
+        uuid id PK
+        uuid trip_id FK
+        string seat_id
+        uuid user_id FK
+        string status
+        datetime held_until
+        datetime created_at
     }
 ```
 
