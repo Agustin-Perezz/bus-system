@@ -79,11 +79,21 @@ classDiagram
         +create(params): User
         +reconstruct(params): User
     }
+    class BusLayout {
+        -_name: string
+        -_layoutGrid: BusLayoutGrid
+        +get name(): string
+        +get layoutGrid(): BusLayoutGrid
+        +create(params): BusLayout
+        +reconstruct(params): BusLayout
+    }
     class Bus {
         -_model: string
         -_enterpriseId: string
+        -_layoutId: string
         +get model(): string
         +get enterpriseId(): string
+        +get layoutId(): string
         +updateModel(model): void
         +updateEnterpriseId(id): void
         +create(params): Bus
@@ -92,29 +102,62 @@ classDiagram
     class Trip {
         -_departureAt: Date
         -_routeId: string
+        -_busId: string
         +get departureAt(): Date
         +get routeId(): string
+        +get busId(): string
         +updateDepartureAt(date): void
         +updateRouteId(id): void
         +create(params): Trip
         +reconstruct(params): Trip
     }
+    class Ticket {
+        -_tripId: string
+        -_seatId: string
+        -_userId: string
+        -_status: TicketStatus
+        -_heldUntil: Date | null
+        +get tripId(): string
+        +get seatId(): string
+        +get userId(): string
+        +get status(): TicketStatus
+        +get heldUntil(): Date | null
+        +isActive(): boolean
+        +hasExpiredHold(now): boolean
+        +confirm(): void
+        +cancel(): void
+        +create(params): Ticket
+        +reconstruct(params): Ticket
+    }
 
     BaseEntity <|-- Enterprise
     BaseEntity <|-- Route
     BaseEntity <|-- User
+    BaseEntity <|-- BusLayout
     BaseEntity <|-- Bus
     BaseEntity <|-- Trip
+    BaseEntity <|-- Ticket
 
     Enterprise --> User : ownerId
     Bus --> Enterprise : enterpriseId
+    Bus --> BusLayout : layoutId
     Trip --> Route : routeId
+    Trip --> Bus : busId
+    Ticket --> Trip : tripId
+    Ticket --> User : userId
 ```
 
 Foreign keys are plain `string` IDs in the domain (no typed references).
-Infrastructure entities declare ORM relations via `p.oneToOne(X).mapToPk()`
-(Enterprise→User) and `p.manyToOne(X).mapToPk()` (Bus→Enterprise, Trip→Route)
-— the relation IS the FK column. See `docs/rules/relations.md`.
+Infrastructure entities declare ORM relations in one of two forms. A relation
+that only carries the foreign key uses `mapToPk`: `p.oneToOne(X).mapToPk()`
+(Enterprise→User) and `p.manyToOne(X).mapToPk()` (Bus→Enterprise, Trip→Route).
+A relation that a use case reads as a loaded object uses a full
+`p.manyToOne(X)` (Bus→BusLayout, Trip→Bus, Ticket→Trip, Ticket→User).
+
+In both forms the relation is the foreign key column, so the column names stay
+the same (`layout_id`, `bus_id`, `trip_id`, `user_id`). Read the key through the
+relation (`bus.layout`). Write it with `em.getReference(...)`. See
+`docs/rules/relations.md`.
 
 ---
 
@@ -193,13 +236,18 @@ user.updateRole('admin');
 | `id` | `string` | UUIDv7 (inherited) |
 | `model` | `string` | Bus model |
 | `enterpriseId` | `string` | FK → Enterprise |
+| `layoutId` | `string` | FK → BusLayout, not null |
 | `createdAt` | `Date` | Creation timestamp (inherited) |
 | `updatedAt` | `Date` | Last modification (inherited) |
 
 Identified by UUID only — no plate field.
 
+**Immutable**: `layoutId` — set on creation, no update method. Every bus has
+exactly one layout, the blueprint of its seats. A layout row is a template:
+two buses can reference the same one.
+
 ```typescript
-const bus = Bus.create({ model: 'Mercedes-Benz O500', enterpriseId });
+const bus = Bus.create({ model: 'Mercedes-Benz O500', enterpriseId, layoutId });
 ```
 
 ---
@@ -211,15 +259,132 @@ const bus = Bus.create({ model: 'Mercedes-Benz O500', enterpriseId });
 | `id` | `string` | UUIDv7 (inherited) |
 | `departureAt` | `Date` | Departure timestamp |
 | `routeId` | `string` | FK → Route |
+| `busId` | `string` | FK → Bus, not null |
 | `createdAt` | `Date` | Creation timestamp (inherited) |
 | `updatedAt` | `Date` | Last modification (inherited) |
 
 `departureAt` is `Date` in the domain, `timestamptz` in infra, ISO string in
 DTOs (`@IsDateString()`). Use cases convert with `new Date(dto.departureAt)`.
 
+**Immutable**: `busId` — assigned when the trip is created. `PUT /trips/:id`
+answers 400 if the request contains it.
+
 ```typescript
-const trip = Trip.create({ departureAt: new Date('2026-08-10T08:00:00Z'), routeId });
+const trip = Trip.create({ departureAt: new Date('2026-08-10T08:00:00Z'), routeId, busId });
 ```
+
+`GET /trips/:id` returns the trip, its bus, and the bus layout grid. The query
+uses one SQL statement with two joins.
+
+---
+
+## BusLayout
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | UUIDv7 (inherited) |
+| `name` | `string` | Template name |
+| `layoutGrid` | `BusLayoutGrid` | jsonb blueprint of the seat map |
+| `createdAt` | `Date` | Creation timestamp (inherited) |
+| `updatedAt` | `Date` | Last modification (inherited) |
+
+There are no update methods: a layout is a template, created once and read by
+every bus that references it. The grid types, the two seeded templates, and the
+deck prefixes live in `src/domain/entities/bus-layout-grid.ts`.
+
+```typescript
+interface BusLayoutGrid {
+  levels: number;    // 1 single deck, 2 double deck
+  rows: number;
+  columns: number;
+  nodes: BusLayoutGridNode[];
+}
+
+interface BusLayoutGridNode {
+  id: string;        // '1A' single deck, 'L1A' / 'U1A' double deck
+  label: string;     // '1A' — repeats per deck
+  type: 'seat' | 'aisle' | 'bathroom' | 'stairs';
+  level: number;
+  row: number;
+  column: number;
+}
+```
+
+Only nodes of type `seat` are bookable. The deck prefixes keep node IDs unique
+across levels. As a result, `(trip_id, seat_id)` identifies a seat without
+ambiguity.
+
+```typescript
+const layout = BusLayout.create({
+  name: STANDARD_BUS_LAYOUT_NAME,
+  layoutGrid: buildStandardBusLayoutGrid(),
+});
+```
+
+---
+
+## Ticket
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | UUIDv7 (inherited) |
+| `tripId` | `string` | FK → Trip |
+| `seatId` | `string` | Grid node id of the trip's bus, for example `1A`, `L1A`, `U1A` |
+| `userId` | `string` | FK → User, the passenger holding the seat |
+| `status` | `TicketStatus` | `'held' \| 'booked' \| 'cancelled'` |
+| `heldUntil` | `Date \| null` | Hold expiration, only on `held` |
+| `createdAt` | `Date` | Creation timestamp (inherited) |
+| `updatedAt` | `Date` | Last modification (inherited) |
+
+Seat states: `held` (temporary checkout lock, must carry `heldUntil`) →
+`booked` (confirmed, hold cleared) → `cancelled` (seat released). `create`
+accepts `held` or `booked` only. Cancellation goes through `cancel()`.
+
+```typescript
+const ticket = Ticket.create({ tripId, seatId: '1A', userId, status: 'held', heldUntil });
+ticket.confirm();  // booked, hold cleared
+ticket.cancel();   // cancelled, seat freed
+```
+
+`isActive()` is true while the status is not `cancelled`. This rule is the exact
+predicate of the partial unique index on the `tickets` table:
+
+```sql
+create unique index "tickets_trip_id_seat_id_unique"
+    on "tickets" ("trip_id", "seat_id") where "status" != 'cancelled';
+```
+
+What that means in practice:
+
+- Two active tickets can never share a seat. The database rejects the second
+  one, so two concurrent requests cannot both take it.
+- An expired hold still blocks its seat, because an index cannot read the
+  clock. Release the seat with `cancel()`. `hasExpiredHold(now)` reports when
+  the hold is due.
+- Cancelled tickets stay in the table as history. They reserve nothing.
+- The database does not check `seatId` against the layout. The rule that a seat
+  must exist as a `seat` node in `trip → bus → layout.layoutGrid` belongs to
+  the booking use case. That use case is the only layer that can read the
+  layout of the trip's bus.
+
+`TicketStatus` is a union type, exported from the domain entity. DTOs will
+validate it with `@IsIn(TICKET_STATUSES)`.
+
+The `status` column is a checked enum as well. MikroORM renders `p.enum` as
+`text` plus a check constraint, and it builds the constraint from
+`TICKET_STATUSES`. As a result, Postgres and SQLite reject a value outside the
+vocabulary:
+
+```sql
+alter table "tickets" add constraint "tickets_status_check"
+    check ("status" in ('held', 'booked', 'cancelled'));
+```
+
+This constraint is necessary. The partial index above compares against the
+exact string `'cancelled'`. A row with a mistyped status (`'HELD'`,
+`'Cancelled'`) counts as active and holds its seat forever. No domain
+transition can release that seat. MikroORM also rejects an out-of-vocabulary
+value before the statement reaches the database.
 
 ---
 

@@ -8,6 +8,7 @@ import { BusEntitySchema } from './src/infrastructure/database/postgres/entities
 import { BusLayoutEntitySchema } from './src/infrastructure/database/postgres/entities/bus-layout.entity';
 import { EnterpriseEntitySchema } from './src/infrastructure/database/postgres/entities/enterprise.entity';
 import { RouteEntitySchema } from './src/infrastructure/database/postgres/entities/route.entity';
+import { TicketEntitySchema } from './src/infrastructure/database/postgres/entities/ticket.entity';
 import { TripEntitySchema } from './src/infrastructure/database/postgres/entities/trip.entity';
 import { UserEntitySchema } from './src/infrastructure/database/postgres/entities/user.entity';
 
@@ -20,6 +21,7 @@ export const ormConfig = defineConfig({
     BusLayoutEntitySchema,
     BusEntitySchema,
     TripEntitySchema,
+    TicketEntitySchema,
   ],
   allowGlobalContext: true,
   extensions: [SeedManager, Migrator],

@@ -8,7 +8,7 @@
 |---|----------|-------------|
 | 00 | [INDEX](00_INDEX.md) | This file - general index |
 | 01 | [ARCHITECTURE](01_ARCHITECTURE.md) | Clean Architecture overview |
-| 02 | [ENTITIES](02_ENTITIES.md) | Domain entities (Enterprise, Route, User, Bus, Trip) |
+| 02 | [ENTITIES](02_ENTITIES.md) | Domain entities (Enterprise, Route, User, BusLayout, Bus, Trip, Ticket) |
 | 03 | [USE_CASES](03_USE_CASES.md) | Complete use case catalog |
 | 04 | [API](04_API.md) | REST endpoints and Swagger documentation |
 | 07 | [TESTING](07_TESTING.md) | Testing guide (unit + e2e) |
@@ -28,7 +28,7 @@ graph TB
     end
 
     subgraph Domain
-        E[Enterprise / Route / User / Bus / Trip]
+        E[Enterprise / Route / User / BusLayout / Bus / Trip / Ticket]
     end
 
     subgraph Infrastructure
