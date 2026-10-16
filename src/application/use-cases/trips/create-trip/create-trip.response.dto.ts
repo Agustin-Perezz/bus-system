@@ -13,6 +13,9 @@ export class CreateTripResponseDto {
   @ApiProperty({ description: 'Route ID' })
   routeId: string;
 
+  @ApiProperty({ description: 'Bus ID' })
+  busId: string;
+
   @ApiProperty({ description: 'Creation timestamp' })
   createdAt: Date;
 

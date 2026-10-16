@@ -11,16 +11,15 @@ const BusEntitySchema = defineEntity({
   properties: {
     model: p.string(),
     enterprise: () => p.manyToOne(EnterpriseEntitySchema).mapToPk(),
-    layout: () => p.manyToOne(BusLayoutEntitySchema).mapToPk(),
+    layout: () => p.manyToOne(BusLayoutEntitySchema),
   },
 });
 
 export class BusEntity extends BusEntitySchema.class {
-  constructor(model: string, enterpriseId: string, layoutId: string) {
+  constructor(model: string, enterpriseId: string) {
     super();
     this.model = model;
     this.enterprise = enterpriseId;
-    this.layout = layoutId;
   }
 }
 

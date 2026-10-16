@@ -35,6 +35,7 @@ export class UpdateTripUseCase {
       id: updated.id,
       departureAt: updated.departureAt,
       routeId: updated.routeId,
+      busId: updated.busId,
       createdAt: updated.createdAt,
       updatedAt: updated.updatedAt,
     });

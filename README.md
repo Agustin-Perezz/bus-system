@@ -4,7 +4,8 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_bus-system4&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_bus-system4)
 
 REST API for a bus transportation system, built with NestJS and Clean
-Architecture. Manages enterprises, routes, users, buses, and trips.
+Architecture. Manages enterprises, routes, users, bus layout templates,
+buses, and trips.
 
 ## Domain Model
 
@@ -12,7 +13,9 @@ Architecture. Manages enterprises, routes, users, buses, and trips.
 erDiagram
     User ||--o| Enterprise : "owns"
     Enterprise ||--o{ Bus : "owns"
+    BusLayout ||--o{ Bus : "blueprints"
     Route ||--o{ Trip : "schedules"
+    Bus ||--o{ Trip : "operates"
 
     Enterprise {
         uuid id PK
@@ -32,15 +35,22 @@ erDiagram
         string email UK
         string role
     }
+    BusLayout {
+        uuid id PK
+        string name
+        jsonb layout_grid
+    }
     Bus {
         uuid id PK
         string model
         uuid enterprise_id FK
+        uuid layout_id FK
     }
     Trip {
         uuid id PK
         datetime departure_at
         uuid route_id FK
+        uuid bus_id FK
     }
 ```
 
@@ -96,7 +106,15 @@ src/
    pnpm docker:logs
    ```
 
-5. **Build and run the application**
+5. **Apply migrations and seed layout templates**
+   ```bash
+   pnpm migration:up
+   pnpm mikro-orm seeder:run
+   ```
+   The seeder inserts the standard single-deck and double-decker bus layout
+   templates that buses reference.
+
+6. **Build and run the application**
    ```bash
    pnpm start:dev     # Development (hot-reload)
    # or
@@ -104,7 +122,7 @@ src/
    pnpm start:prod
    ```
 
-6. **Verify it works**
+7. **Verify it works**
    - API: http://localhost:3000
    - Swagger: http://localhost:3000/api
 
@@ -151,6 +169,12 @@ pnpm check              # Lint + format + organize imports
 pnpm docker:up          # Start PostgreSQL
 pnpm docker:down        # Stop PostgreSQL
 pnpm docker:logs        # View PostgreSQL logs
+
+# Database migrations & seeding
+pnpm migration:up        # Apply pending migrations
+pnpm migration:down      # Revert the last migration
+pnpm migration:list      # List executed and pending migrations
+pnpm mikro-orm seeder:run # Seed bus layout templates
 
 # Verification
 npx tsc --noEmit        # Type check

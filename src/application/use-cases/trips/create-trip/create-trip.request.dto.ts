@@ -12,4 +12,11 @@ export class CreateTripRequestDto {
   @ApiProperty({ description: 'Route ID', example: '0193b1a0-0000-7bbb-8bbb-000000000001' })
   @IsUUID()
   routeId: string;
+
+  @ApiProperty({
+    description: 'Bus ID assigned to the trip',
+    example: '01a13f8a-99b8-7419-b0ea-de165a7b4fe5',
+  })
+  @IsUUID()
+  busId: string;
 }

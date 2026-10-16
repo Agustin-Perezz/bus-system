@@ -1,8 +1,6 @@
 {
   "name": "public",
-  "namespaces": [
-    "public"
-  ],
+  "namespaces": ["public"],
   "tables": [
     {
       "name": "bus_layouts",
@@ -96,9 +94,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "bus_layouts_pkey",
@@ -220,9 +216,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "buses_pkey",
@@ -234,25 +228,17 @@
       "triggers": [],
       "foreignKeys": {
         "buses_enterprise_id_foreign": {
-          "columnNames": [
-            "enterprise_id"
-          ],
+          "columnNames": ["enterprise_id"],
           "constraintName": "buses_enterprise_id_foreign",
           "localTableName": "public.buses",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.enterprises"
         },
         "buses_layout_id_foreign": {
-          "columnNames": [
-            "layout_id"
-          ],
+          "columnNames": ["layout_id"],
           "constraintName": "buses_layout_id_foreign",
           "localTableName": "public.buses",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.bus_layouts"
         }
       },
@@ -367,9 +353,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "legal_id"
-          ],
+          "columnNames": ["legal_id"],
           "composite": false,
           "constraint": true,
           "keyName": "enterprises_legal_id_unique",
@@ -377,9 +361,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "owner_id"
-          ],
+          "columnNames": ["owner_id"],
           "composite": false,
           "constraint": true,
           "keyName": "enterprises_owner_id_unique",
@@ -387,9 +369,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "enterprises_pkey",
@@ -401,14 +381,10 @@
       "triggers": [],
       "foreignKeys": {
         "enterprises_owner_id_foreign": {
-          "columnNames": [
-            "owner_id"
-          ],
+          "columnNames": ["owner_id"],
           "constraintName": "enterprises_owner_id_foreign",
           "localTableName": "public.enterprises",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.users"
         }
       },
@@ -523,9 +499,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "routes_pkey",
@@ -542,6 +516,23 @@
       "name": "trips",
       "schema": "public",
       "columns": {
+        "bus_id": {
+          "name": "bus_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamptz(6)",
@@ -630,9 +621,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "trips_pkey",
@@ -643,15 +632,18 @@
       "checks": [],
       "triggers": [],
       "foreignKeys": {
+        "trips_bus_id_foreign": {
+          "columnNames": ["bus_id"],
+          "constraintName": "trips_bus_id_foreign",
+          "localTableName": "public.trips",
+          "referencedColumnNames": ["id"],
+          "referencedTableName": "public.buses"
+        },
         "trips_route_id_foreign": {
-          "columnNames": [
-            "route_id"
-          ],
+          "columnNames": ["route_id"],
           "constraintName": "trips_route_id_foreign",
           "localTableName": "public.trips",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.routes"
         }
       },
@@ -766,9 +758,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "email"
-          ],
+          "columnNames": ["email"],
           "composite": false,
           "constraint": true,
           "keyName": "users_email_unique",
@@ -776,9 +766,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "users_pkey",
