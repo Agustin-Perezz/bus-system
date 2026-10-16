@@ -21,6 +21,7 @@ export class ListTripsUseCase {
             id: trip.id,
             departureAt: trip.departureAt,
             routeId: trip.routeId,
+            busId: trip.busId,
             createdAt: trip.createdAt,
             updatedAt: trip.updatedAt,
           }),

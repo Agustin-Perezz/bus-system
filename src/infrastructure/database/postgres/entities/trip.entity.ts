@@ -1,6 +1,7 @@
 import { defineEntity, p } from '@mikro-orm/core';
 
 import { BaseEntity } from './base.entity';
+import { BusEntitySchema } from './bus.entity';
 import { RouteEntitySchema } from './route.entity';
 
 const TripEntitySchema = defineEntity({
@@ -10,6 +11,7 @@ const TripEntitySchema = defineEntity({
   properties: {
     departureAt: p.datetime(),
     route: () => p.manyToOne(RouteEntitySchema).mapToPk(),
+    bus: () => p.manyToOne(BusEntitySchema),
   },
 });
 

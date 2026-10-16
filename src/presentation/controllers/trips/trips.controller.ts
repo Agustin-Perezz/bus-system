@@ -44,7 +44,7 @@ export class TripsController {
     type: CreateTripResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Invalid data' })
-  @ApiResponse({ status: 404, description: 'Route not found' })
+  @ApiResponse({ status: 404, description: 'Route or bus not found' })
   async create(@Body() dto: CreateTripRequestDto): Promise<CreateTripResponseDto> {
     return this.createTripUseCase.execute(dto);
   }
@@ -61,11 +61,11 @@ export class TripsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a trip by ID' })
+  @ApiOperation({ summary: 'Get a trip by ID with its bus and layout blueprint' })
   @ApiParam({ name: 'id', description: 'Trip ID' })
   @ApiResponse({
     status: 200,
-    description: 'Trip found',
+    description: 'Trip found, including the assigned bus and its layout grid for bookings',
     type: GetTripResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Trip not found' })

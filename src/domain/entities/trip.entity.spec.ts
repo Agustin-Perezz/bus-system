@@ -3,16 +3,18 @@ import { Trip } from './trip.entity';
 describe('Trip Entity', () => {
   const fixedDate = new Date('2026-08-10T08:00:00.000Z');
   const routeId = '0193b1a0-0000-7bbb-8bbb-000000000001';
+  const busId = '0193b1a0-0000-7bbb-8bbb-000000000010';
 
   describe('create', () => {
-    it('creates a trip with departureAt, routeId and base entity props', () => {
-      const trip = Trip.create({ departureAt: fixedDate, routeId });
+    it('creates a trip with departureAt, routeId, busId and base entity props', () => {
+      const trip = Trip.create({ departureAt: fixedDate, routeId, busId });
 
       expect(trip.id).toMatch(
         /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
       );
       expect(trip.departureAt).toBe(fixedDate);
       expect(trip.routeId).toBe(routeId);
+      expect(trip.busId).toBe(busId);
       expect(trip.createdAt).toBeInstanceOf(Date);
       expect(trip.updatedAt).toBeInstanceOf(Date);
       expect(trip.createdAt.getTime()).toBe(trip.updatedAt.getTime());
@@ -29,6 +31,7 @@ describe('Trip Entity', () => {
         id,
         departureAt: fixedDate,
         routeId,
+        busId,
         createdAt,
         updatedAt,
       });
@@ -38,12 +41,13 @@ describe('Trip Entity', () => {
       expect(trip.updatedAt).toBe(updatedAt);
       expect(trip.departureAt).toBe(fixedDate);
       expect(trip.routeId).toBe(routeId);
+      expect(trip.busId).toBe(busId);
     });
   });
 
   describe('updateDepartureAt', () => {
     it('mutates departureAt and advances updatedAt', async () => {
-      const trip = Trip.create({ departureAt: fixedDate, routeId });
+      const trip = Trip.create({ departureAt: fixedDate, routeId, busId });
       const originalUpdatedAt = trip.updatedAt;
       const newDate = new Date('2026-08-11T09:00:00.000Z');
 
@@ -57,7 +61,7 @@ describe('Trip Entity', () => {
 
   describe('updateRouteId', () => {
     it('mutates routeId and advances updatedAt', async () => {
-      const trip = Trip.create({ departureAt: fixedDate, routeId });
+      const trip = Trip.create({ departureAt: fixedDate, routeId, busId });
       const originalUpdatedAt = trip.updatedAt;
       const newRouteId = '0193b1a0-0000-7bbb-8bbb-000000000099';
 

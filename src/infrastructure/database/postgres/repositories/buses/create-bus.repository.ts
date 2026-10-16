@@ -23,10 +23,11 @@ export class CreateBusRepository implements ICreateBusRepository {
 
   async create(bus: Bus): Promise<Bus> {
     return this.repository.getEntityManager().transactional(async (em) => {
-      const entity = new BusEntity(bus.model, bus.enterpriseId, bus.layoutId);
+      const entity = new BusEntity(bus.model, bus.enterpriseId);
       entity.id = bus.id;
       entity.createdAt = bus.createdAt;
       entity.updatedAt = bus.updatedAt;
+      entity.layout = em.getReference(BusLayoutEntity, bus.layoutId);
       await em.persist(entity).flush();
       return bus;
     });

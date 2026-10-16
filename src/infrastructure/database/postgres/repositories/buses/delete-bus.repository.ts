@@ -35,7 +35,7 @@ export class DeleteBusRepository implements IDeleteBusRepository {
       id: entity.id,
       model: entity.model,
       enterpriseId: entity.enterprise,
-      layoutId: entity.layout,
+      layoutId: entity.layout.id,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });

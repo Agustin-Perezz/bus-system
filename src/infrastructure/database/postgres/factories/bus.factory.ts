@@ -3,6 +3,7 @@ import { Factory } from '@mikro-orm/seeder';
 import { v7 as uuidv7 } from 'uuid';
 
 import { BusEntity } from '../entities/bus.entity';
+import { BusLayoutEntity } from '../entities/bus-layout.entity';
 
 export class BusFactory extends Factory<BusEntity> {
   model = BusEntity;
@@ -11,7 +12,7 @@ export class BusFactory extends Factory<BusEntity> {
     return {
       model: faker.vehicle.model(),
       enterprise: uuidv7(),
-      layout: uuidv7(),
+      layout: this.em.getReference(BusLayoutEntity, uuidv7()),
     };
   }
 }

@@ -56,7 +56,7 @@ describe('Buses Controller (e2e)', () => {
     const bus = await new BusFactory(orm.em).createOne({
       model: 'Mercedes-Benz O500',
       enterprise: enterpriseId,
-      layout: layoutId,
+      layout,
     });
     busId = bus.id;
   });

@@ -25,6 +25,7 @@ export class ListTripsRepository implements IListTripsRepository {
       id: entity.id,
       departureAt: entity.departureAt,
       routeId: entity.route,
+      busId: entity.bus.id,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });

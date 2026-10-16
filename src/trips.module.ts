@@ -6,6 +6,8 @@ import { DeleteTripUseCase } from './application/use-cases/trips/delete-trip/del
 import { GetTripUseCase } from './application/use-cases/trips/get-trip/get-trip.use-case';
 import { ListTripsUseCase } from './application/use-cases/trips/list-trips/list-trips.use-case';
 import { UpdateTripUseCase } from './application/use-cases/trips/update-trip/update-trip.use-case';
+import { BusEntitySchema } from './infrastructure/database/postgres/entities/bus.entity';
+import { BusLayoutEntitySchema } from './infrastructure/database/postgres/entities/bus-layout.entity';
 import { RouteEntitySchema } from './infrastructure/database/postgres/entities/route.entity';
 import { TripEntitySchema } from './infrastructure/database/postgres/entities/trip.entity';
 import { CreateTripRepository } from './infrastructure/database/postgres/repositories/trips/create-trip.repository';
@@ -44,6 +46,13 @@ import { TripsController } from './presentation/controllers/trips/trips.controll
     UpdateTripUseCase,
     DeleteTripUseCase,
   ],
-  imports: [MikroOrmModule.forFeature([TripEntitySchema, RouteEntitySchema])],
+  imports: [
+    MikroOrmModule.forFeature([
+      TripEntitySchema,
+      RouteEntitySchema,
+      BusEntitySchema,
+      BusLayoutEntitySchema,
+    ]),
+  ],
 })
 export class TripsModule {}
