@@ -29,7 +29,7 @@ Five resources, each with full CRUD:
 | Route | `/routes` | Travel routes between terminals | — |
 | User | `/users` | People (may own an enterprise) | — |
 | Bus | `/buses` | Vehicles owned by an enterprise | `enterpriseId` → Enterprise, `layoutId` → BusLayout |
-| Trip | `/trips` | Scheduled departures on a route | `routeId` → Route |
+| Trip | `/trips` | Scheduled departures on a route | `routeId` → Route, `busId` → Bus |
 
 ---
 
@@ -111,11 +111,20 @@ stay unique across the whole layout, while `label` repeats per deck
 ### Trip
 
 ```json
-{ "departureAt": "2026-08-10T08:00:00.000Z", "routeId": "<uuid>" }
+{
+  "departureAt": "2026-08-10T08:00:00.000Z",
+  "routeId": "<uuid>",
+  "busId": "<uuid>"
+}
 ```
 
 - `departureAt` is an ISO 8601 date string.
 - `routeId` must reference an existing route (404 if missing).
+- `busId` must reference an existing bus (404 if missing).
+
+`GET /trips/:id` returns the trip together with its assigned bus and the
+nested `layoutGrid` blueprint from the bus's layout template, loaded in a
+single joined query — the shape booking flows need to render a seat map.
 
 ---
 

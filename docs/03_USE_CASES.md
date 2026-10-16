@@ -52,6 +52,7 @@ These rules apply to every use case in this document.
 - A `Bus` references a `BusLayout` through `layoutId`.
 - An `Enterprise` references a `User` through `ownerId`.
 - A `Trip` references a `Route` through `routeId`.
+- A `Trip` references a `Bus` through `busId`.
 - A `Route` has no foreign key.
 
 ---
@@ -394,7 +395,7 @@ export class UpdateRouteRequestDto {
 
 ### UC-TRI-001: Create Trip
 
-**Summary**: Creates a new trip on a route.
+**Summary**: Creates a new trip on a route with an assigned bus.
 
 ### Request DTO
 
@@ -405,12 +406,16 @@ export class CreateTripRequestDto {
 
     @IsUUID()
     routeId: string;
+
+    @IsUUID()
+    busId: string;
 }
 ```
 
 ### Business Rules
 
 - The `routeId` must reference an existing route
+- The `busId` must reference an existing bus
 - The use case converts `departureAt` to a `Date`
 - The route check runs before all other rules
 
@@ -419,13 +424,16 @@ export class CreateTripRequestDto {
 | Condition | Exception |
 |-----------|-----------|
 | Route not found | `NotFoundException` (404) |
+| Bus not found | `NotFoundException` (404) |
 | Invalid input | `BadRequestException` (400) |
 
 ---
 
 ### UC-TRI-002: Get Trip
 
-**Summary**: Returns one trip by its ID.
+**Summary**: Returns one trip by its ID, including the assigned bus and the
+nested `layoutGrid` blueprint from its layout template, loaded in a single
+joined query.
 
 ### Error Cases
 
